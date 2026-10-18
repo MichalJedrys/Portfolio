@@ -24,7 +24,7 @@ bool BooksTable::clearBooksTable(database* db)
 }
 
 bool BooksTable::addBook(database* db, const Book& book) {
-    std::string sql = "INSERT or REPLACE INTO books (title, author, genre, isbn) VALUES (?, ?, ?, ?)";
+    std::string sql = "INSERT INTO books (title, author, genre, isbn) VALUES (?, ?, ?, ?)";
     sqlStatement* statement;
     if (!prepareStatement(db, sql, &statement)) {
         std::cerr << "SQL error: " << errorMessage(db) << std::endl;
@@ -35,7 +35,10 @@ bool BooksTable::addBook(database* db, const Book& book) {
     setText(statement, 3, book.mGenre);
     setText(statement, 4, book.mIsbn);
     if (!evaluateStatement(statement)) {
-        std::cerr << "SQL error: " << errorMessage(db) << std::endl;
+        if (sqlite3_extended_errcode(db) == SQLITE_CONSTRAINT_UNIQUE)
+            std::cerr << "A book with this ISBN already exists." << std::endl;
+        else
+            std::cerr << "SQL error: " << errorMessage(db) << std::endl;
         sqlFinalize(statement);
         return false;
     }

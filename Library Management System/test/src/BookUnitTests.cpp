@@ -139,3 +139,26 @@ TEST(BookIdTest, LargeIdsSurviveReadUpdateAndDelete) {
         EXPECT_TRUE(BooksTable::viewBooks(db.get()).empty());
     }
 }
+
+TEST(BookInsertTest, DuplicateIsbnPreservesOriginalBook) {
+    database* rawDb = nullptr;
+    const bool opened = openDatabase(":memory:", &rawDb);
+    std::unique_ptr<database, decltype(&sqlite3_close)> db(rawDb, sqlite3_close);
+    ASSERT_TRUE(opened);
+    ASSERT_TRUE(BooksTable::createBooksTable(db.get()));
+
+    const Book original(0, "Original", "Original Author", "Fiction", "9781234567890");
+    ASSERT_TRUE(BooksTable::addBook(db.get(), original));
+    const auto before = BooksTable::viewBooks(db.get());
+    ASSERT_EQ(before.size(), 1u);
+
+    const Book duplicate(0, "Replacement", "Different Author", "History", original.mIsbn);
+    EXPECT_FALSE(BooksTable::addBook(db.get(), duplicate));
+    const auto after = BooksTable::viewBooks(db.get());
+    ASSERT_EQ(after.size(), 1u);
+    EXPECT_EQ(after[0].mId, before[0].mId);
+    EXPECT_EQ(after[0], original);
+
+    ASSERT_TRUE(BooksTable::addBook(db.get(), Book(0, "Another", "Author", "Genre", "9780987654321")));
+    EXPECT_EQ(BooksTable::viewBooks(db.get()).size(), 2u);
+}
