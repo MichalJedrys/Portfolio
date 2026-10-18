@@ -1,0 +1,35 @@
+name: Portfolio C++ projects
+
+on:
+  push:
+    branches: [develop, main]
+    paths:
+      - 'projects/srt-parser/**'
+      - 'projects/scheduling-simulator/**'
+      - '.github/workflows/portfolio-cpp.yml'
+  pull_request:
+    branches: [main, develop]
+    paths:
+      - 'projects/srt-parser/**'
+      - 'projects/scheduling-simulator/**'
+      - '.github/workflows/portfolio-cpp.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  build-and-test:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+        project: [srt-parser]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Configure
+        run: cmake -S projects/${{ matrix.project }} -B build/${{ matrix.project }} -DCMAKE_BUILD_TYPE=Release
+      - name: Build
+        run: cmake --build build/${{ matrix.project }} --config Release --parallel 2
+      - name: Test
+        run: ctest --test-dir build/${{ matrix.project }} -C Release --output-on-failure

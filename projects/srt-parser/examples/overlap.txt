@@ -1,0 +1,4 @@
+at 1.005 show 'First subtitle'
+at 1.500 show 'First subtitle\nSecond subtitle'
+at 2.000 show 'Second subtitle'
+at 3.010 show ''

@@ -1,0 +1,11 @@
+execute_process(COMMAND "${PROGRAM}" "${INPUT}" "${OUTPUT}"
+    RESULT_VARIABLE result ERROR_VARIABLE error)
+if(NOT result EQUAL 0)
+    message(FATAL_ERROR "CLI failed: ${error}")
+endif()
+file(READ "${OUTPUT}" actual)
+file(READ "${EXPECTED}" expected)
+string(REPLACE "\r\n" "\n" expected "${expected}")
+if(NOT actual STREQUAL expected)
+    message(FATAL_ERROR "Example output differs from the committed expected output")
+endif()

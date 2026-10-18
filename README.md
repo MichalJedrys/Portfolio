@@ -18,6 +18,7 @@ See [current projects](projects/README.md) for the showcase work and [earlier pr
 
 | Project | Focus | Current scope |
 | --- | --- | --- |
+| [SRT Parser — refactored](projects/srt-parser/README.md) | C++17, CMake, CTest | Standalone library and CLI, exact millisecond boundaries, and regression tests. |
 | [Library Management System](Library%20Management%20System/README.md) | C++17, SQLite, GoogleTest | Console book catalogue with add, list, update, and delete operations and database tests. |
 | [SRT Parser](Srt%20Parser%20Project/README.md) | C++17, STL, GoogleTest | Converts subtitles into timestamped text changes; tests include overlaps and malformed input. |
 | [Snake Game](Snake%20Game/README.md) | C++11, Windows console API | Keyboard controls, scoring, collision detection, and restart support. |
