@@ -20,6 +20,7 @@ bool TimeLineCheck(int i, char c)
 
 pairVec SrtParserBase::Arrange()
 {
+    vec.clear();
     std::vector<std::string>lines;
     std::string newLine = "";
     for (auto& s : data)

@@ -1,5 +1,6 @@
 #include <gtest/gtest.h>
 #include "SrtParserFakeFile.hpp"
+#include "SrtParserRealFile.hpp"
 
 class SrtParserTests : public ::testing::Test {
 protected:
@@ -199,4 +200,52 @@ TEST_F(SrtParserTests, FinalCueWithSingleTrailingNewline)
     SP_fake.ReadFile(input);
     SP_fake.Arrange();
     EXPECT_EQ(SP_fake.WriteToFile(""), "at 1,00 show 'Hello'\nat 2,00 show ''\n");
+}
+
+TEST_F(SrtParserTests, RepeatedArrangeProducesSameEvents)
+{
+    std::istringstream input("1\n00:00:01,000 --> 00:00:02,000\nHello\n\n");
+    SP_fake.ReadFile(input);
+    const auto first = SP_fake.Arrange();
+    EXPECT_EQ(SP_fake.Arrange(), first);
+    EXPECT_EQ(SP_fake.WriteToFile(""), "at 1,00 show 'Hello'\nat 2,00 show ''\n");
+}
+
+TEST_F(SrtParserTests, ReadingNewInputClearsPreviousEvents)
+{
+    std::istringstream first("1\n00:00:01,000 --> 00:00:02,000\nOld\n\n");
+    SP_fake.ReadFile(first);
+    SP_fake.Arrange();
+
+    std::istringstream second("1\n00:00:03,000 --> 00:00:04,000\nNew\n\n");
+    SP_fake.ReadFile(second);
+    EXPECT_TRUE(SP_fake.WriteToFile("").empty());
+    SP_fake.Arrange();
+    EXPECT_EQ(SP_fake.WriteToFile(""), "at 3,00 show 'New'\nat 4,00 show ''\n");
+
+    std::istringstream empty("");
+    SP_fake.ReadFile(empty);
+    EXPECT_TRUE(SP_fake.WriteToFile("").empty());
+    EXPECT_TRUE(SP_fake.Arrange().empty());
+}
+
+TEST(SrtParserRealFileTests, ReadingNewInputReplacesPreviousEvents)
+{
+    SrtParserRealFile parser;
+    std::istringstream first("1\n00:00:01,000 --> 00:00:02,000\nOld\n\n");
+    parser.ReadFile(first);
+    parser.Arrange();
+
+    std::istringstream second("1\n00:00:03,000 --> 00:00:04,000\nNew\n\n");
+    parser.ReadFile(second);
+    const auto events = parser.Arrange();
+    ASSERT_EQ(events.size(), 2u);
+    EXPECT_NEAR(events[0].first, 3.0, 1e-9);
+    EXPECT_EQ(events[0].second, "New");
+    EXPECT_NEAR(events[1].first, 4.0, 1e-9);
+    EXPECT_TRUE(events[1].second.empty());
+
+    std::istringstream empty("");
+    parser.ReadFile(empty);
+    EXPECT_TRUE(parser.Arrange().empty());
 }
