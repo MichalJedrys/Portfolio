@@ -1,43 +1,32 @@
-# LIBRARY MANAGEMENT SYSTEM
+# Library Management System
 
-## Description
+A C++17 and SQLite learning project implementing a console book catalogue.
 
-The Library Management System (LMS) is a software tool that helps manage a library's daily tasks. It makes it easy to handle book inventory, register members, and manage book loans and returns. 
-Admins can log in to manage books and users, while members can log in to search for, borrow, and return books. The LMS is built with C++ and SQLite. All functionalities are tested with GTest. 
-Still in development.
+[Back to portfolio](../README.md)
 
-## Current features
+## Implemented scope
 
-1. Book Management:
+- Add books with a title, author, genre, and ISBN.
+- List, update, and delete stored books through a console menu.
+- Store records in SQLite, using prepared statements for book mutations.
+- GoogleTest cases exercise add, view, update, and delete operations against a test database.
 
-* Add, update, list and delete books.
+Login, member management, borrowing, returns, fines, search, and reporting are future ideas, not implemented application features. User-related source files exist but are not included in the current library build target.
 
-## Future additions
+## Code to review
 
-1. Book Management:
+- [Console menu](source/src/Menu.cpp)
+- [Book table operations](source/src/Table.cpp) and [SQLite wrapper](source/include/SQLiteWrapper.hpp)
+- [Book model](source/include/Book.hpp)
+- [Database tests](test/src/BookUnitTests.cpp)
+- [Entry point](output/src/main.cpp)
 
-* Search for books by title, author, genre, and ISBN.
-* Track book availability status.
+## Build and run notes
 
-2. User Authentication:
+Requires CMake 3.10 or later and a C++17 compiler. SQLite source and GoogleTest are bundled under `3rd_party/`. See the [repository guide](../docs/REPOSITORY_GUIDE.md) for build commands and the existing GoogleTest build caveat. A fresh build has not been verified in this documentation pass.
 
-* Admin and member login.
-* Admin can manage books and users.
-* Members can search, borrow, and return books.
+The executable target is `LibraryManagementSystem`. It opens or creates `LibraryDatabase.db` in its working directory. Run it from a scratch directory to preserve the committed sample database. Tests use a database named `TestDatabase` in their working directory.
 
-3. Member Management:
+## Next improvements
 
-* Register new members.
-* Update member information.
-* View member borrowing history.
-
-4. Loan Management:
-
-* Issue books to members.
-* Return books and update availability.
-* Track due dates and overdue fines.
-
-5. Reports:
-
-* Generate reports for borrowed books.
-* Generate reports for overdue books.
+Verify reproducible builds and tests, strengthen input validation and database error handling, and extend tests before adding member or loan workflows.

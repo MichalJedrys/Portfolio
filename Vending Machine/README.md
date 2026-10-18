@@ -1,17 +1,30 @@
-# Vending Machine
+# Vending Machine — C++
 
-## Description
+A C++17 console simulation with display, controller, and feeder components.
 
-Implementation of vending machine program with abstracted components (Display, Feeder, Controller). 
-The machine supports 10 different drinks and options for adding extras (milk, sugar, soy sauce - depending on the type of drink). 
-A coin payment system is used, along with the option of giving change. Currently, communication with the machine is via a console, 
-but a graphical interface design is planned for the future. A maintenance mode has also been implemented, which allows an authorised 
-user to obtain information about transactions, take money out of the machine or shut it down. 
+[Back to portfolio](../README.md) · [Python variant](../Vending%20Machine%20%28Python%29/README.md)
 
-## Future additions
+## Implemented scope
 
-There are few features in development:
-- more user-friendly interface
-- testing
-- parallel funcionality (ex. time limitation for money insertion) utilising multithreading
-- more advanced maintenance options
+- Ten products: hot drinks and soups, with milk, sugar, or soy sauce options depending on the selection.
+- Simulated coin payments, cancellation by entering zero, and change calculation.
+- Maintenance options for session transactions, resetting collected money, and shutdown.
+- Exceptions for several invalid menu choices and payment values.
+
+This is a learning simulation. Its maintenance password is hardcoded, transactions are held in memory, and money uses floating-point values. Entering zero simulates a payment timeout; an actual timed payment workflow is not implemented.
+
+## Code to review
+
+- [Workflow](source/src/VendingMachine.cpp)
+- [Payments and maintenance](source/src/Controller.cpp)
+- [Console menus](source/src/Display.cpp)
+- [Product extras](source/src/Feeder.cpp)
+- [Entry point](output/src/main.cpp)
+
+## Build and run notes
+
+Requires CMake 3.10 or later and a C++17 compiler. The executable target is `VendingMachine`, with output configured under `output/`. See the [repository guide](../docs/REPOSITORY_GUIDE.md) for build commands. A fresh build and interactive execution have not been verified in this documentation pass. No project-owned automated tests are present.
+
+## Next improvements
+
+Add payment and input-validation tests, represent money in integer units, and separate simulation state from console I/O before extending the interface.

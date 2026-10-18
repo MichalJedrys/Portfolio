@@ -1,17 +1,28 @@
-# Vending Machine
+# Vending Machine — Python
 
-## Description
+A Python variant of the [C++ vending-machine exercise](../Vending%20Machine/README.md), with display, controller, feeder, and orchestration classes.
 
-Implementation of vending machine program with abstracted components (Display, Feeder, Controller). 
-The machine supports 10 different drinks and options for adding extras (milk, sugar, soy sauce - depending on the type of drink). 
-A coin payment system is used, along with the option of giving change. Currently, communication with the machine is via a console, 
-but a graphical interface design is planned for the future. A maintenance mode has also been implemented, which allows an authorised 
-user to obtain information about transactions, take money out of the machine or shut it down. 
+[Back to portfolio](../README.md)
 
-## Future additions
+## Code to review
 
-There are few features in development:
-- more user-friendly interface
-- testing
-- parallel funcionality (ex. time limitation for money insertion) utilising multithreading
-- more advanced maintenance options
+- [Entry point](source/main.py)
+- [Workflow](source/VendingMachine.py)
+- [Payments and catalogue](source/Controller.py)
+- [Display](source/Display.py) and [extras](source/Feeder.py)
+
+The console workflow includes product selection, simulated payments and change, and maintenance options. It uses a hardcoded demo password and session-only transaction history.
+
+## Run
+
+Requires Python 3.10 or later because the source uses `match` statements. From the repository root:
+
+```powershell
+python "Vending Machine (Python)/source/main.py"
+```
+
+The source uses standard-library modules. Direct execution avoids the existing CMake helper, which creates a virtual environment and attempts package upgrades during configuration using a Unix-style environment path.
+
+## Current limitations
+
+The payment reader uses `int()` even though the menu advertises fractional coins; fractional payments are therefore not handled correctly. Input handling, money representation, and automated tests need improvement. No project-owned automated tests are present, and interactive execution has not been verified in this documentation pass.
