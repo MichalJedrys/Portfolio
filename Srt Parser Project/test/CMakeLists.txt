@@ -19,3 +19,9 @@ target_link_libraries(unit_tests PUBLIC
 )
 
 gtest_discover_tests(unit_tests XML_OUTPUT_DIR ${CMAKE_BINARY_DIR}/test_results/unit_tests)
+
+add_test(NAME SrtParserCli.Help COMMAND SrtParser --help)
+set_tests_properties(SrtParserCli.Help PROPERTIES PASS_REGULAR_EXPRESSION "Usage:")
+
+add_test(NAME SrtParserCli.InvalidArguments COMMAND SrtParser input.srt)
+set_tests_properties(SrtParserCli.InvalidArguments PROPERTIES WILL_FAIL TRUE)

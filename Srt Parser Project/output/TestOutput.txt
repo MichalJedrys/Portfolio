@@ -1,47 +1,47 @@
-at 1.00 show 'Raz
+at 1,00 show 'Raz
 dva
 tri'
-at 5.50 show ''
-at 6.00 show 'chetyre piat'
-at 9.50 show ''
-at 10.00 show 'vyshel
-zaichik
+at 5,50 show ''
+at 6,00 show 'chetyre piat'
+at 9,50 show ''
+at 10,00 show 'vyshel
+zaichiq
 poguliat'
-at 11.00 show 'vyshel
-zaichik
+at 11,00 show 'vyshel
+zaichiq
 poguliat
 belyi zaichiq'
-at 12.00 show 'vyshel
-zaichik
+at 12,00 show 'vyshel
+zaichiq
 poguliat
-belyi zaichik
+belyi zaichiq
 naglyi zaichiq'
-at 13.00 show 'vyshel
-zaichik
+at 13,00 show 'vyshel
+zaichiq
 poguliat
-belyi zaichik
-naglyi zaichik
+belyi zaichiq
+naglyi zaichiq
 vyshel
 i ushel'
-at 14.50 show 'vyshel
-zaichik
+at 14,50 show 'vyshel
+zaichiq
 poguliat
-belyi zaichik
+belyi zaichiq
 vyshel
 i ushel'
-at 15.00 show 'vyshel
-zaichik
+at 15,00 show 'vyshel
+zaichiq
 poguliat
-belyi zaichik
+belyi zaichiq
 vyshel
 i ushel
 toptun'
-at 15.50 show 'belyi zaichik
+at 15,50 show 'belyi zaichiq
 vyshel
 i ushel
 toptun'
-at 16.50 show 'belyi zaichiq
+at 16,50 show 'belyi zaichiq
 toptun'
-at 17.50 show 'belyi zaichiq'
-at 19.50 show 'vot i vsyo'
-at 19.60 show ''
+at 17,50 show 'belyi zaichiq'
+at 19,50 show 'vot i vsyo'
+at 19,60 show ''
