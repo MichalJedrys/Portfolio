@@ -162,3 +162,31 @@ TEST(BookInsertTest, DuplicateIsbnPreservesOriginalBook) {
     ASSERT_TRUE(BooksTable::addBook(db.get(), Book(0, "Another", "Author", "Genre", "9780987654321")));
     EXPECT_EQ(BooksTable::viewBooks(db.get()).size(), 2u);
 }
+
+TEST(BookMutationTest, MissingBookIdsDoNotReportSuccess) {
+    database* rawDb = nullptr;
+    const bool opened = openDatabase(":memory:", &rawDb);
+    std::unique_ptr<database, decltype(&sqlite3_close)> db(rawDb, sqlite3_close);
+    ASSERT_TRUE(opened);
+    ASSERT_TRUE(BooksTable::createBooksTable(db.get()));
+    ASSERT_TRUE(BooksTable::addBook(db.get(), Book(0, "Original", "Author", "Genre", "9781234567890")));
+    auto books = BooksTable::viewBooks(db.get());
+    ASSERT_EQ(books.size(), 1u);
+    const Book original = books[0];
+    Book missing = original;
+    missing.mId++;
+    missing.mTitle = "Missing";
+
+    EXPECT_FALSE(BooksTable::updateBook(db.get(), missing));
+    EXPECT_FALSE(BooksTable::deleteBook(db.get(), missing.mId));
+    books = BooksTable::viewBooks(db.get());
+    ASSERT_EQ(books.size(), 1u);
+    EXPECT_EQ(books[0].mId, original.mId);
+    EXPECT_EQ(books[0], original);
+
+    EXPECT_TRUE(BooksTable::updateBook(db.get(), original));
+    ASSERT_TRUE(BooksTable::deleteBook(db.get(), original.mId));
+    EXPECT_FALSE(BooksTable::deleteBook(db.get(), original.mId));
+    EXPECT_FALSE(BooksTable::updateBook(db.get(), original));
+    EXPECT_TRUE(BooksTable::viewBooks(db.get()).empty());
+}

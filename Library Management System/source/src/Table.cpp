@@ -84,8 +84,11 @@ bool BooksTable::updateBook(database* db, const Book& book) {
         sqlFinalize(statement);
         return false;
     }
+    const bool found = sqlite3_changes(db) > 0;
     sqlFinalize(statement);
-    return true;
+    if (!found)
+        std::cerr << "Book not found." << std::endl;
+    return found;
 }
 
 bool BooksTable::deleteBook(database* db, int bookId) {
@@ -101,6 +104,9 @@ bool BooksTable::deleteBook(database* db, int bookId) {
         sqlFinalize(statement);
         return false;
     }
+    const bool found = sqlite3_changes(db) > 0;
     sqlFinalize(statement);
-    return true;
+    if (!found)
+        std::cerr << "Book not found." << std::endl;
+    return found;
 }
