@@ -2,8 +2,6 @@
 
 A console book catalogue to practice C++17 and SQLite.
 
-[Back to portfolio](../README.md)
-
 ## Implemented scope
 
 - Add books with a title, author, genre, and ISBN.
@@ -30,3 +28,5 @@ The executable target is `LibraryManagementSystem`. It opens or creates `Library
 ## Next improvements
 
 Verify reproducible builds and tests, strengthen input validation and database error handling, and extend tests before adding member or loan workflows.
+
+[Back to portfolio](../README.md)

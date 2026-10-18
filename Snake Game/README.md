@@ -2,8 +2,6 @@
 
 A C++11 console implementation of Snake for Windows, separating game logic from console handling.
 
-[Back to portfolio](../README.md)
-
 ## Gameplay
 
 - Move with **W**, **A**, **S**, and **D**; press **X** to end the round.
@@ -28,3 +26,5 @@ The CMake executable target is `snake`, with output configured under `output/`. 
 ## Next improvements
 
 Extract testable game rules from console I/O before considering variable speed, obstacles, or alternative rendering.
+
+[Back to portfolio](../README.md)

@@ -2,7 +2,7 @@
 
 A C++17 console simulation with display, controller, and feeder components.
 
-[Back to portfolio](../README.md) · [Python variant](../Vending%20Machine%20%28Python%29/README.md)
+[Python variant](../Vending%20Machine%20%28Python%29/README.md)
 
 ## Implemented scope
 
@@ -28,3 +28,5 @@ Requires CMake 3.10 or later and a C++17 compiler. The executable target is `Ven
 ## Next improvements
 
 Add payment and input-validation tests, represent money in integer units, and separate simulation state from console I/O before extending the interface.
+
+[Back to portfolio](../README.md)
