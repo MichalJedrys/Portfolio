@@ -23,6 +23,10 @@ Despite its name, `output/` contains tracked source and sample data as well as e
 
 ## C++ build starting points
 
+The new [SRT Parser](../projects/srt-parser/README.md) and [scheduling simulator](../projects/scheduling-simulator/README.md) have independent CMake 3.20+ builds and dependency-free tests. Their README commands build into `build/` without modifying the original projects. The [C++ workflow](../.github/workflows/portfolio-cpp.yml) builds and tests both on Linux and Windows.
+
+The notes below describe the original projects, whose build configuration remains unchanged.
+
 Each C++ project has its own CMake configuration. From the repository root:
 
 ```powershell

@@ -1,0 +1,11 @@
+execute_process(COMMAND "${PROGRAM}" "${POLICY}" "${INPUT}"
+    RESULT_VARIABLE result OUTPUT_VARIABLE actual ERROR_VARIABLE error)
+if(NOT result EQUAL 0)
+    message(FATAL_ERROR "CLI failed: ${error}")
+endif()
+file(READ "${EXPECTED}" expected)
+string(REPLACE "\r\n" "\n" expected "${expected}")
+string(REPLACE "\r\n" "\n" actual "${actual}")
+if(NOT actual STREQUAL expected)
+    message(FATAL_ERROR "Report differs from committed expected output:\n${actual}")
+endif()

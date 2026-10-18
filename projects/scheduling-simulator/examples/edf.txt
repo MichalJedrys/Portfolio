@@ -1,0 +1,17 @@
+timeline
+0-1 A
+1-3 B
+3-4 C
+4-8 A
+
+id,completion,turnaround,waiting,response,deadline_missed
+A,8,8,3,0,no
+B,3,2,0,0,no
+C,4,1,0,0,no
+
+mean_waiting=1.000
+mean_turnaround=3.667
+mean_response=0.000
+deadline_misses=0
+cpu_utilization=1.000
+throughput=0.375
