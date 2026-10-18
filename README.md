@@ -1,6 +1,6 @@
 # Michał Jędrys | C++ Portfolio
 
-Learning projects exploring C++, object-oriented design, SQLite persistence, parsing, and console applications.
+Learning projects to explore C++, object-oriented design, SQLite persistence, parsing, and console applications.
 
 ## Projects
 
@@ -12,7 +12,7 @@ Learning projects exploring C++, object-oriented design, SQLite persistence, par
 | [Vending Machine — C++](Vending%20Machine/README.md) | C++17, console simulation | Product selection, simulated coin payments and change, and maintenance options. |
 | [Vending Machine — Python](Vending%20Machine%20%28Python%29/README.md) | Python 3 | A Python variant of the vending-machine exercise. |
 
-Start with **Library Management System** for database interaction or **SRT Parser** for parsing logic and test cases. These are learning projects; their individual READMEs describe current limitations.
+Start with **Library Management System** for database interaction or **SRT Parser** for parsing logic and test cases. Current limitations are documented in the individual READMEs.
 
 ## Explore the code
 

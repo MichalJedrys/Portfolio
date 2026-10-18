@@ -25,4 +25,4 @@ The source uses standard-library modules. Direct execution avoids the existing C
 
 ## Current limitations
 
-The payment reader uses `int()` even though the menu advertises fractional coins; fractional payments are therefore not handled correctly. Input handling, money representation, and automated tests need improvement. No project-owned automated tests are present, and interactive execution has not been verified in this documentation pass.
+The payment reader uses `int()` even though the menu advertises fractional coins; fractional payments are therefore not handled correctly. Input handling and money representation remain to be improved, and automated tests remain to be added. No project-owned automated tests are present, and interactive execution has not been verified as part of this README update.

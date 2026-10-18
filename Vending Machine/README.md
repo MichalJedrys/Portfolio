@@ -23,7 +23,7 @@ This is a learning simulation. Its maintenance password is hardcoded, transactio
 
 ## Build and run notes
 
-Requires CMake 3.10 or later and a C++17 compiler. The executable target is `VendingMachine`, with output configured under `output/`. See the [repository guide](../docs/REPOSITORY_GUIDE.md) for build commands. A fresh build and interactive execution have not been verified in this documentation pass. No project-owned automated tests are present.
+Requires CMake 3.10 or later and a C++17 compiler. The executable target is `VendingMachine`, with output configured under `output/`. See the [repository guide](../docs/REPOSITORY_GUIDE.md) for build commands. A fresh build and interactive execution have not been verified as part of this README update. No project-owned automated tests are present.
 
 ## Next improvements
 
