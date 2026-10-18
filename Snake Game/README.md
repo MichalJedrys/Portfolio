@@ -1,19 +1,30 @@
-# SNAKE GAME
+# Snake Game
 
-## Description
+A C++11 console implementation of Snake for Windows, separating game logic from console handling.
 
-Simple implementation of popular game.
-Typical rules apply:
-- WASD control.
-- You have to eat fruits(F) to score points. 
-- Hitting the snake on the wall or on itself means the end of the game.
+[Back to portfolio](../README.md)
 
-Interface:
+## Gameplay
 
-![Screenshot](img/console.png)
+- Move with **W**, **A**, **S**, and **D**; press **X** to end the round.
+- Eat fruit (`F`) to grow and score 10 points.
+- A wall or self-collision ends the round.
+- Use **Y** or **N** at the game-over prompt to restart or exit.
 
-## Future additions
-There are few features in development:
-- more advanced graphics
-- levels (changing speed)
-- obstacles
+![Snake running in the console](img/console.png)
+
+## Code to review
+
+- [Movement, scoring, and collisions](src/Game.cpp)
+- [Console support and restart menu](src/Console.cpp)
+- [Entry point](src/main.cpp)
+
+## Build and run notes
+
+Requires Windows, CMake 3.10 or later, and a C++11 compiler with Windows console headers. The implementation uses Windows APIs and `_kbhit`/`_getch`; it is not currently portable to Linux or macOS.
+
+The CMake executable target is `snake`, with output configured under `output/`. See the [repository guide](../docs/REPOSITORY_GUIDE.md) for build commands. A fresh build and interactive gameplay have not been verified in this documentation pass. No project-owned automated tests are present.
+
+## Next improvements
+
+Extract testable game rules from console I/O before considering variable speed, obstacles, or alternative rendering.
