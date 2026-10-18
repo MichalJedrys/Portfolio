@@ -111,3 +111,31 @@ TEST(SQLiteBindingTest, BookTextSurvivesBindingUntilStatementExecution) {
     EXPECT_NE(std::find(stored.begin(), stored.end(), shortBook), stored.end());
     EXPECT_NE(std::find(stored.begin(), stored.end(), longBook), stored.end());
 }
+
+TEST(BookIdTest, LargeIdsSurviveReadUpdateAndDelete) {
+    database* rawDb = nullptr;
+    const bool opened = openDatabase(":memory:", &rawDb);
+    std::unique_ptr<database, decltype(&sqlite3_close)> db(rawDb, sqlite3_close);
+    ASSERT_TRUE(opened);
+    ASSERT_TRUE(BooksTable::createBooksTable(db.get()));
+
+    for (const int id : {255, 256, 65536}) {
+        SCOPED_TRACE(id);
+        ASSERT_TRUE(prepAndEvaluate(db.get(),
+            "INSERT INTO books (id, title, author, genre, isbn) VALUES (" +
+            std::to_string(id) + ", 'Original', 'Author', 'Genre', '9781234567890')"));
+        auto books = BooksTable::viewBooks(db.get());
+        ASSERT_EQ(books.size(), 1u);
+        ASSERT_EQ(books[0].mId, id);
+
+        books[0].mTitle = "Updated";
+        ASSERT_TRUE(BooksTable::updateBook(db.get(), books[0]));
+        books = BooksTable::viewBooks(db.get());
+        ASSERT_EQ(books.size(), 1u);
+        EXPECT_EQ(books[0].mId, id);
+        EXPECT_EQ(books[0].mTitle, "Updated");
+
+        ASSERT_TRUE(BooksTable::deleteBook(db.get(), books[0].mId));
+        EXPECT_TRUE(BooksTable::viewBooks(db.get()).empty());
+    }
+}

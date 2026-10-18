@@ -48,7 +48,7 @@ inline std::string getText(sqlStatement* stmt, uint8_t column) {
     return std::string(reinterpret_cast<const char*>(sqlite3_column_text(stmt, column)));
 }
 
-inline uint8_t getInt(sqlStatement* stmt, uint8_t column) {
+inline int getInt(sqlStatement* stmt, uint8_t column) {
     return sqlite3_column_int(stmt, column);
 }
 
