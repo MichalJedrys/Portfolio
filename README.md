@@ -1,6 +1,18 @@
-# Michał Jędrys | C++ Portfolio
+# Michał Jędrys | C++ Software Engineer
 
-Learning projects exploring C++, object-oriented design, SQLite persistence, parsing, and console applications.
+I am a C++ software engineer with over three years of professional experience in Linux-based real-time and embedded systems across telecommunications and automotive software. My work includes modern C++17/20, performance-sensitive algorithms, unit and integration testing, and code review.
+
+My professional experience includes 5G Layer 2 packet-scheduling software at Nokia and embedded automotive software at VESOFTx. This repository contains personal projects; it does not contain employer code.
+
+## Engineering focus
+
+- Modern C++ and maintainable interfaces.
+- Deterministic behavior, algorithm design, and performance analysis.
+- Linux and embedded systems, with automated tests and reproducible builds.
+
+## Portfolio navigation
+
+See [current projects](projects/README.md) for the showcase work and [earlier projects](archive/README.md) for the original console exercises. The earlier projects document my learning history; they are not a substitute for my professional experience.
 
 ## Projects
 
@@ -12,7 +24,7 @@ Learning projects exploring C++, object-oriented design, SQLite persistence, par
 | [Vending Machine — C++](Vending%20Machine/README.md) | C++17, console simulation | Product selection, simulated coin payments and change, and maintenance options. |
 | [Vending Machine — Python](Vending%20Machine%20%28Python%29/README.md) | Python 3 | A Python variant of the vending-machine exercise. |
 
-Start with **Library Management System** for database interaction or **SRT Parser** for parsing logic and test cases. These are learning projects; their individual READMEs describe current limitations.
+Start with **SRT Parser** for parsing logic and test cases, or **Library Management System** for database interaction. Project READMEs distinguish implemented behavior from limitations and planned work.
 
 ## Explore the code
 

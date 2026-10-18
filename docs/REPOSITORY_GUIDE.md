@@ -14,6 +14,8 @@ Original project directories and public paths are retained. This guide adds navi
 | `Vending Machine/` | C++17 console simulation |
 | `Vending Machine (Python)/` | Python variant of the simulation |
 | `docs/` | Repository navigation and development notes |
+| `projects/` | Current project index and new showcase implementations |
+| `archive/` | Navigation to earlier exercises at their original paths |
 
 Library, parser, and C++ vending-machine projects keep library code in `source/` and executable entry points in `output/src/`. Library and parser tests are under `test/`, with bundled dependencies under `3rd_party/`. Snake uses `src/` and `include/`; Python uses `source/`.
 
@@ -36,6 +38,8 @@ These commands are starting points, not a verified build recipe. Library and par
 Run database tests and demos in disposable working directories. The library creates database files; the parser uses fixed input/output filenames. Preserve committed samples when experimenting. See each project README for runtime details.
 
 ## Development and release
+
+See the [refactor plan](REFACTOR_PLAN.md) for project classification and the staged transition to the new layout.
 
 - `main` remains the default, recruiter-facing version.
 - Prepare and review this refactor on `develop`.
