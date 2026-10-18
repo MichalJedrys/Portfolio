@@ -12,15 +12,14 @@ std::string SrtParserFakeFile::WriteToFile(std::string filename)
     std::ostringstream toString;
     for (auto& p : vec)
     {
-        toString << "at " << std::fixed << std::setprecision(2) << p.first << " show '" << p.second << "'\n";
+        std::ostringstream timestamp;
+        timestamp.imbue(std::locale::classic());
+        timestamp << std::fixed << std::setprecision(2) << p.first;
+        std::string time = timestamp.str();
+        std::replace(time.begin(), time.end(), '.', ',');
+        toString << "at " << time << " show '" << p.second << "'\n";
     }
     filename = toString.str();
-
-    for (auto &c : filename)
-    {
-        if (c == '.')
-            c = ',';
-    }
 
     return filename;
 }

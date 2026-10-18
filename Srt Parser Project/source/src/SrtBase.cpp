@@ -59,7 +59,7 @@ pairVec SrtParserBase::Arrange()
 
     for (auto &line : lines)
     {
-        if (text)
+        if (text && line != "\n")
         {
             tempPart.s_text = tempPart.s_text + line;
         }
@@ -209,23 +209,10 @@ pairVec SrtParserBase::Arrange()
 
     vec.erase(remove_if(vec.begin(), vec.end(), [](std::pair<double, std::string> p) {return p.second == "delete"; }), vec.end());
     
-    char prevC = 'a';
     for (auto& d : vec)
     {
-        for (int i = 0; i < d.second.length(); i++)
-        {
-            if (d.second[i] == '\n' && i == d.second.length() - 1)
-            {
-                d.second.erase(d.second.begin() + i);
-            }
-
-            if(d.second[i] == '\n' && prevC == '\n')
-                d.second.erase(d.second.begin() + i);
-
-            prevC = d.second[i];
-        }
-        if (d.second.length()>2)
-            d.second.erase(d.second.end() - 1);
+        if (!d.second.empty() && d.second.back() == '\n')
+            d.second.pop_back();
     }
 
     return vec;

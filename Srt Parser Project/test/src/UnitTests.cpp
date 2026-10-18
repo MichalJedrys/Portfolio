@@ -249,3 +249,26 @@ TEST(SrtParserRealFileTests, ReadingNewInputReplacesPreviousEvents)
     parser.ReadFile(empty);
     EXPECT_TRUE(parser.Arrange().empty());
 }
+
+TEST_F(SrtParserTests, SubtitleTextIsPreserved)
+{
+    for (const std::string text : {"A", "AB", "delete", "Hello.", "It's 3.14.",
+                                  "  Keep spaces  ", "Line one\nLine two"})
+    {
+        SCOPED_TRACE(text);
+        std::istringstream input("1\n00:00:01,000 --> 00:00:02,000\n" + text + "\n\n");
+        SP_fake.ReadFile(input);
+        SP_fake.Arrange();
+        EXPECT_EQ(SP_fake.WriteToFile(""), "at 1,00 show '" + text + "'\nat 2,00 show ''\n");
+    }
+}
+
+TEST_F(SrtParserTests, OverlappingSubtitlesPreserveTextAndLineBreaks)
+{
+    std::istringstream input("1\n00:00:01,000 --> 00:00:03,000\nA\nB\n\n"
+                             "2\n00:00:02,000 --> 00:00:04,000\nC.\n\n");
+    SP_fake.ReadFile(input);
+    SP_fake.Arrange();
+    EXPECT_EQ(SP_fake.WriteToFile(""),
+              "at 1,00 show 'A\nB'\nat 2,00 show 'A\nB\nC.'\nat 3,00 show 'C.'\nat 4,00 show ''\n");
+}
