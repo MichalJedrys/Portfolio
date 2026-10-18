@@ -21,10 +21,10 @@ A C++11 console implementation of Snake for Windows, separating game logic from 
 
 Requires Windows, CMake 3.10 or later, and a C++11 compiler with Windows console headers. The implementation uses Windows APIs and `_kbhit`/`_getch`; it is not currently portable to Linux or macOS.
 
-The CMake executable target is `snake`, with output configured under `output/`. See the [repository guide](../docs/REPOSITORY_GUIDE.md) for build commands. A fresh build and interactive gameplay have not been verified as part of this README update. No project-owned automated tests are present.
+The CMake executable target is `snake`, with output configured under `output/`. See the [repository guide](../../docs/REPOSITORY_GUIDE.md) for build commands. A fresh build and interactive gameplay have not been verified as part of this README update. No project-owned automated tests are present.
 
 ## Next improvements
 
 Extract testable game rules from console I/O before considering variable speed, obstacles, or alternative rendering.
 
-[Back to portfolio](../README.md)
+[Back to portfolio](../../README.md)

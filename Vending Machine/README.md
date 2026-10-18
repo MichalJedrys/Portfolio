@@ -2,7 +2,7 @@
 
 A C++17 console simulation with display, controller, and feeder components.
 
-[Python variant](../Vending%20Machine%20%28Python%29/README.md)
+[Python variant](../archive/Vending%20Machine%20%28Python%29/README.md)
 
 ## Implemented scope
 

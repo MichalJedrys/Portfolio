@@ -4,15 +4,15 @@
 
 ## Existing layout
 
-Original project directories and public paths are retained. This guide adds navigation without relocating source, samples, dependencies, or binaries.
+Active projects are kept at the repository root. Snake Game and the Python vending-machine project are stored under `archive/`.
 
 | Directory | Purpose |
 | --- | --- |
 | `Library Management System/` | C++17 book catalogue, SQLite, and database tests |
 | `Srt Parser Project/` | C++17 subtitle parser, samples, and tests |
-| `Snake Game/` | C++11 Windows console game |
+| `archive/Snake Game/` | C++11 Windows console game |
 | `Vending Machine/` | C++17 console simulation |
-| `Vending Machine (Python)/` | Python variant of the simulation |
+| `archive/Vending Machine (Python)/` | Python variant of the simulation |
 | `docs/` | Repository navigation and development notes |
 
 ## C++ build starting points
