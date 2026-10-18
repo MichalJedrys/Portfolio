@@ -1,5 +1,7 @@
 #include "SrtBase.hpp"
 
+#include <limits>
+
 bool TimeLineCheck(int i, char c)
 {
 	std::array<int,18> Arr = { 1,2,4,5,7,8,10,11,12,16,17,19,20,22,23,25,26,27 };
@@ -30,6 +32,11 @@ pairVec SrtParserBase::Arrange()
         }
     }
 
+    if (!newLine.empty())
+        lines.push_back(newLine + '\n');
+    if (!lines.empty() && lines.back() != "\n")
+        lines.push_back("\n");
+
     struct Part
     {
         double stTime = 0.0;
@@ -46,7 +53,6 @@ pairVec SrtParserBase::Arrange()
     Part tempPart;
     int checkNum = 0, checkNumPrev = 0;
     bool endPart = false;
-    int numC = 0;
     int timeC = 1;
     bool badTime = false;
 
@@ -117,19 +123,23 @@ pairVec SrtParserBase::Arrange()
         {
             endPart = 1;
             checkNum = 0;
-            numC = 0;
             for (auto c : line)
             {
-                if (isdigit(c))
+                if (c >= '0' && c <= '9')
                 {
-                    checkNum = checkNum + (c - '0')*pow(10,numC);
+                    const int digit = c - '0';
+                    if (checkNum > (std::numeric_limits<int>::max() - digit) / 10)
+                    {
+                        checkNum = checkNumPrev;
+                        break;
+                    }
+                    checkNum = checkNum * 10 + digit;
                 }
-                else if (!isdigit(c) && c != '\n')
+                else if (c != '\n')
                 {
                     checkNum = checkNumPrev;
                     break;
                 }
-                numC++;
             }
             if (checkNumPrev == checkNum - 1)
             {

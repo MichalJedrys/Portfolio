@@ -57,10 +57,10 @@ TEST_F(SrtParserTests, SimpleCase)
 }
 
 
-TEST_F(SrtParserTests, DoubleNewLineEnd)
+TEST_F(SrtParserTests, FinalCueWithoutTrailingNewline)
 {
 	const std::string TestedInput = "1\n00:00 : 01, 000 -- > 00:00 : 05, 500\nRaz\ndva\ntri\n\n2\n00:00 : 06, 000 -- > 00:00 : 09, 500\nchetyre piat\n\n3\n00:00 : 10, 000 -- > 00:00 : 12, 500\nvyshel\nzaichiq\npoguliat";
-	const std::string TestedOutput = "at 1,00 show 'Raz\ndva\ntri'\nat 5,50 show ''\nat 6,00 show 'chetyre piat'\nat 9,50 show ''\n";
+	const std::string TestedOutput = "at 1,00 show 'Raz\ndva\ntri'\nat 5,50 show ''\nat 6,00 show 'chetyre piat'\nat 9,50 show ''\nat 10,00 show 'vyshel\nzaichiq\npoguliat'\nat 12,50 show ''\n";
 	std::string Output;
 
 	std::istringstream istr(TestedInput);
@@ -143,19 +143,19 @@ TEST_F(SrtParserTests, Intersection)
 	EXPECT_EQ(Output, TestedOutput);
 }
 
-TEST_F(SrtParserTests, Performance)
+TEST_F(SrtParserTests, ManySequentialRecords)
 {
 	int N = 5000;
 	std::string TestedInput;
 	std::string strA;
-	for (int i = 0; i < N; i++)
+	for (int i = 1; i <= N; i++)
 	{
 		strA = fillA(i);
 		TestedInput = TestedInput + std::to_string(i) + "\n00:00 : 01,000 -- > 00:00 : 10,000\nThe code is " + strA + "!\n\n";
 	}
 
 	std::string TestedOutput = "at 1,00 show '";
-	for (int i = 1; i < 10; i++)
+	for (int i = 1; i <= N; i++)
 	{
 		strA = fillA(i);
 		TestedOutput = TestedOutput + "The code is " + strA + "!\n";
@@ -191,4 +191,12 @@ TEST_F(SrtParserTests, WrongTimes)
 	Output = SP_fake.WriteToFile(Output);
 
 	EXPECT_EQ(Output, TestedOutput);
+}
+
+TEST_F(SrtParserTests, FinalCueWithSingleTrailingNewline)
+{
+    std::istringstream input("1\n00:00:01,000 --> 00:00:02,000\nHello\n");
+    SP_fake.ReadFile(input);
+    SP_fake.Arrange();
+    EXPECT_EQ(SP_fake.WriteToFile(""), "at 1,00 show 'Hello'\nat 2,00 show ''\n");
 }

@@ -15,7 +15,7 @@ A C++17 learning project to read subtitle input and produce text describing when
 
 Cases cover example input, empty input, missing trailing blank lines, incorrect record numbers, nested and intersecting subtitles, malformed timestamps, and a larger generated input. Their presence does not imply complete SRT format support or a measured performance guarantee.
 
-The algorithm samples the timeline in 0.1-second steps. The missing-trailing-blank-lines test records the current behavior of dropping the unfinished final record; it does not demonstrate recovery of that record. Format validation and end-of-file handling remain to be improved.
+The final cue is retained without a trailing blank line or newline. The large-input test checks all 5,000 sequential records; it is not a performance benchmark. The algorithm still samples the timeline in 0.1-second steps, and format validation remains to be improved.
 
 ## Build and run notes
 
