@@ -1,6 +1,7 @@
 #include <gtest/gtest.h>
 #include "SrtParserFakeFile.hpp"
 #include "SrtParserRealFile.hpp"
+#include <stdexcept>
 
 class SrtParserTests : public ::testing::Test {
 protected:
@@ -271,4 +272,47 @@ TEST_F(SrtParserTests, OverlappingSubtitlesPreserveTextAndLineBreaks)
     SP_fake.Arrange();
     EXPECT_EQ(SP_fake.WriteToFile(""),
               "at 1,00 show 'A\nB'\nat 2,00 show 'A\nB\nC.'\nat 3,00 show 'C.'\nat 4,00 show ''\n");
+}
+
+TEST(SrtParserRealFileTests, UnopenedInputThrows)
+{
+    SrtParserRealFile parser;
+    std::ifstream input("");
+    EXPECT_THROW(parser.ReadFile(input), std::runtime_error);
+}
+
+TEST(SrtParserRealFileTests, FailedInputThrows)
+{
+    SrtParserRealFile parser;
+    std::istringstream input("content");
+    input.setstate(std::ios::badbit);
+    EXPECT_THROW(parser.ReadFile(input), std::runtime_error);
+}
+
+TEST(SrtParserRealFileTests, ErrorDuringReadThrows)
+{
+    class FailingBuffer : public std::streambuf
+    {
+        std::streamsize xsgetn(char*, std::streamsize) override
+        {
+            throw std::runtime_error("Simulated read error");
+        }
+    } buffer;
+    std::istream input(&buffer);
+    SrtParserRealFile parser;
+    EXPECT_THROW(parser.ReadFile(input), std::runtime_error);
+}
+
+TEST(SrtParserRealFileTests, EmptyInputIsValid)
+{
+    SrtParserRealFile parser;
+    std::istringstream input("");
+    EXPECT_NO_THROW(parser.ReadFile(input));
+    EXPECT_TRUE(parser.Arrange().empty());
+}
+
+TEST(SrtParserRealFileTests, InvalidOutputPathThrows)
+{
+    SrtParserRealFile parser;
+    EXPECT_THROW(parser.WriteToFile(""), std::runtime_error);
 }

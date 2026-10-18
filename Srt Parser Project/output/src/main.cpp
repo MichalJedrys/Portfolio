@@ -1,4 +1,5 @@
 #include "SrtParserRealFile.hpp"
+#include <stdexcept>
 
 using namespace std;
 
@@ -11,6 +12,8 @@ int main()
 		//Import data form file
 		ifstream InputFile;
 		InputFile.open("TestInput.srt");
+		if (!InputFile)
+			throw std::runtime_error("Cannot open input file: TestInput.srt");
 
 		//Read file
 		SP.ReadFile(InputFile);
@@ -26,7 +29,7 @@ int main()
 	catch(const std::exception& e)
 	{
 		std::cerr << "Error: " << e.what() << '\n';
-		system("pause");
+		return 1;
 	}
 	return 0;
 }
