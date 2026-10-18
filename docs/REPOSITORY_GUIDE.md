@@ -15,10 +15,6 @@ Original project directories and public paths are retained. This guide adds navi
 | `Vending Machine (Python)/` | Python variant of the simulation |
 | `docs/` | Repository navigation and development notes |
 
-Library, parser, and C++ vending-machine projects keep library code in `source/` and executable entry points in `output/src/`. Library and parser tests are under `test/`, with bundled dependencies under `3rd_party/`. Snake uses `src/` and `include/`; Python uses `source/`.
-
-Despite its name, `output/` contains tracked source and sample data as well as executables. Do not delete or blanket-ignore it as generated build output.
-
 ## C++ build starting points
 
 Each C++ project has its own CMake configuration. From the repository root:
@@ -34,15 +30,3 @@ Use the corresponding source directory and a distinct build directory for each p
 These commands are starting points, not a verified build recipe. Library and parser configurations import GoogleTest archives from fixed `lib/libgtest*.a` and `lib/libgmock*.a` paths, which may not match the generator or compiler, especially MSVC. Reproducible build support needs verification. Existing CMake targets also write executables into tracked project `output/` directories even when configured out of tree.
 
 Run database tests and demos in disposable working directories. The library creates database files; the parser uses fixed input/output filenames. Preserve committed samples when experimenting. See each project README for runtime details.
-
-## Development and release
-
-- `main` remains the default, recruiter-facing version.
-- Prepare and review this refactor on `develop`.
-- Keep every existing public file and directory path until an explicitly approved release; assess links before later relocation or removal.
-- Use normal new commits with truthful messages. Do not backdate commits, rewrite existing history, or invent prior project origins.
-- Before proposing a release, verify README links, build/test results, runtime examples, and feature claims. Obtain explicit approval before merging or changing the default branch, visibility, or publishing configuration.
-
-## Initial documentation pass
-
-This pass updates navigation and descriptions based on source inspection and adds no application features. Build and runtime verification remain open: CMake and a C++ compiler were not available on the command path used for this pass.
