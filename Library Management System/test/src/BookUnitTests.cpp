@@ -2,6 +2,8 @@
 #include "Book.hpp"
 #include "Table.hpp"
 #include "SQLiteWrapper.hpp"
+#include <algorithm>
+#include <memory>
 
 class BookTest : public ::testing::Test {
 protected:
@@ -89,4 +91,23 @@ TEST_F(BookTest, DeleteBook) {
 
     //Clean
     BooksTable::clearBooksTable(db);
+}
+
+TEST(SQLiteBindingTest, BookTextSurvivesBindingUntilStatementExecution) {
+    database* rawDb = nullptr;
+    const bool opened = openDatabase(":memory:", &rawDb);
+    std::unique_ptr<database, decltype(&sqlite3_close)> db(rawDb, sqlite3_close);
+    ASSERT_TRUE(opened);
+    ASSERT_TRUE(BooksTable::createBooksTable(db.get()));
+
+    const Book shortBook(0, "Title", "Author", "Genre", "9781234567890");
+    const Book longBook(0, std::string(128, 'T'), std::string(128, 'A'),
+                       std::string(128, 'G'), "9780987654321");
+    ASSERT_TRUE(BooksTable::addBook(db.get(), shortBook));
+    ASSERT_TRUE(BooksTable::addBook(db.get(), longBook));
+
+    const auto stored = BooksTable::viewBooks(db.get());
+    ASSERT_EQ(stored.size(), 2u);
+    EXPECT_NE(std::find(stored.begin(), stored.end(), shortBook), stored.end());
+    EXPECT_NE(std::find(stored.begin(), stored.end(), longBook), stored.end());
 }

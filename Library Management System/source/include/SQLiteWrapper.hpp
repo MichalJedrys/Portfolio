@@ -21,7 +21,7 @@ inline bool prepareStatement(database* db, std::string str, sqlStatement** stmt)
 }
 
 inline void setText(sqlStatement* stmt, uint8_t position, std::string str){
-    sqlite3_bind_text(stmt, position, str.c_str(), -1, SQLITE_STATIC);
+    sqlite3_bind_text(stmt, position, str.c_str(), -1, SQLITE_TRANSIENT);
 }
 
 inline void setInt(sqlStatement* stmt, uint8_t position, int value) {
