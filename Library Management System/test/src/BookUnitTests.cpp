@@ -7,6 +7,7 @@
 #include <array>
 #include <memory>
 #include <sstream>
+#include <stdexcept>
 
 class BookTest : public ::testing::Test {
 protected:
@@ -242,4 +243,66 @@ TEST_F(BookMenuTest, EofLeavesIncompleteOperationsWithoutDatabaseChanges) {
         EXPECT_EQ(books[0].mId, 1);
         EXPECT_EQ(books[0], original);
     }
+}
+
+TEST_F(BookTest, BindingErrorsAreReported) {
+    sqlStatement* rawStatement = nullptr;
+    ASSERT_TRUE(prepareStatement(db, "SELECT ?", &rawStatement));
+    std::unique_ptr<sqlStatement, decltype(&sqlite3_finalize)> statement(rawStatement, sqlite3_finalize);
+    EXPECT_FALSE(setText(statement.get(), 2, "Text"));
+    EXPECT_FALSE(setInt(statement.get(), 2, 1));
+}
+
+TEST_F(BookTest, OversizedBindingsLeaveBooksUnchanged) {
+    const Book original(0, "Original", "Author", "Genre", "9781234567890");
+    ASSERT_TRUE(BooksTable::addBook(db, original));
+    books = BooksTable::viewBooks(db);
+    ASSERT_EQ(books.size(), 1u);
+    const int originalId = books[0].mId;
+    const int oldLimit = sqlite3_limit(db, SQLITE_LIMIT_LENGTH, 200);
+    Book oversized(0, "Changed", "Author", std::string(256, 'G'), "9780987654321");
+    EXPECT_FALSE(BooksTable::addBook(db, oversized));
+    oversized.mId = originalId;
+    oversized.mIsbn = original.mIsbn;
+    EXPECT_FALSE(BooksTable::updateBook(db, oversized));
+    sqlite3_limit(db, SQLITE_LIMIT_LENGTH, oldLimit);
+    books = BooksTable::viewBooks(db);
+    ASSERT_EQ(books.size(), 1u);
+    EXPECT_EQ(books[0].mId, originalId);
+    EXPECT_EQ(books[0], original);
+}
+
+TEST_F(BookTest, QueryErrorsAreNotEmptyResults) {
+    EXPECT_TRUE(BooksTable::viewBooks(db).empty());
+    ASSERT_TRUE(prepAndEvaluate(db, "DROP TABLE books"));
+    EXPECT_THROW(BooksTable::viewBooks(db), std::runtime_error);
+    // This view prepares successfully but fails during execution with integer overflow.
+    ASSERT_TRUE(prepAndEvaluate(db,
+        "CREATE VIEW books AS SELECT 1 AS id, 'Title' AS title, 'Author' AS author, "
+        "abs(-9223372036854775808) AS genre, 'ISBN' AS isbn"));
+    EXPECT_THROW(BooksTable::viewBooks(db), std::runtime_error);
+}
+
+TEST_F(BookTest, NullGenreIsReadAsEmptyText) {
+    ASSERT_TRUE(prepAndEvaluate(db,
+        "INSERT INTO books (title, author, isbn) VALUES ('Title', 'Author', '9781234567890')"));
+    books = BooksTable::viewBooks(db);
+    ASSERT_EQ(books.size(), 1u);
+    EXPECT_TRUE(books[0].mGenre.empty());
+    EXPECT_EQ(books[0].mTitle, "Title");
+}
+
+TEST_F(BookTest, ClearTableReportsSuccessAndFailure) {
+    ASSERT_TRUE(BooksTable::addBook(db, Book(0, "Title", "Author", "Genre", "9781234567890")));
+    EXPECT_TRUE(BooksTable::clearBooksTable(db));
+    EXPECT_TRUE(BooksTable::viewBooks(db).empty());
+    ASSERT_TRUE(prepAndEvaluate(db, "DROP TABLE books"));
+    EXPECT_FALSE(BooksTable::clearBooksTable(db));
+}
+
+TEST_F(BookMenuTest, QueryFailureIsReportedAndMenuContinues) {
+    ASSERT_TRUE(prepAndEvaluate(db, "DROP TABLE books"));
+    const auto output = runMenu("2\n5\n");
+    EXPECT_NE(output.find("Failed to list books:"), std::string::npos);
+    EXPECT_NE(output.find("Exiting..."), std::string::npos);
 }

@@ -1,6 +1,7 @@
 #include "Table.hpp"
 #include "Book.hpp"
 #include <iostream>
+#include <stdexcept>
 
 bool BooksTable::createBooksTable(database* db) {
     std::string sqlCreateTable =
@@ -16,11 +17,7 @@ bool BooksTable::createBooksTable(database* db) {
 
 bool BooksTable::clearBooksTable(database* db)
 {
-    std::string sqlDeleteTable = "DELETE FROM books";
-    prepAndEvaluate(db, sqlDeleteTable);
-
-    std::string sqlVacummTable ="VACUUM";
-    return prepAndEvaluate(db, sqlDeleteTable);
+    return prepAndEvaluate(db, "DELETE FROM books");
 }
 
 bool BooksTable::addBook(database* db, const Book& book) {
@@ -30,11 +27,11 @@ bool BooksTable::addBook(database* db, const Book& book) {
         std::cerr << "SQL error: " << errorMessage(db) << std::endl;
         return false;
     }
-    setText(statement, 1, book.mTitle);
-    setText(statement, 2, book.mAuthor);
-    setText(statement, 3, book.mGenre);
-    setText(statement, 4, book.mIsbn);
-    if (!evaluateStatement(statement)) {
+    if (!setText(statement, 1, book.mTitle) ||
+        !setText(statement, 2, book.mAuthor) ||
+        !setText(statement, 3, book.mGenre) ||
+        !setText(statement, 4, book.mIsbn) ||
+        !evaluateStatement(statement)) {
         if (sqlite3_extended_errcode(db) == SQLITE_CONSTRAINT_UNIQUE)
             std::cerr << "A book with this ISBN already exists." << std::endl;
         else
@@ -51,17 +48,22 @@ std::vector<Book> BooksTable::viewBooks(database* db) {
     std::string sql = "SELECT id, title, author, genre, isbn FROM books";
     sqlStatement* statement;
     if (!prepareStatement(db, sql, &statement)) {
-        std::cerr << "SQL error: " << errorMessage(db) << std::endl;
-        return books;
+        throw std::runtime_error(std::string("SQL error: ") + errorMessage(db));
     }
     Book book;
-    while (hasRow(statement)) {
+    int result;
+    while ((result = sqlite3_step(statement)) == SQLITE_ROW) {
         book.mId = getInt(statement, 0);
         book.mTitle = getText(statement, 1);
         book.mAuthor = getText(statement, 2);
         book.mGenre = getText(statement, 3);
         book.mIsbn = getText(statement, 4);
         books.push_back(book);
+    }
+    if (result != SQLITE_DONE) {
+        const std::string error = errorMessage(db);
+        sqlFinalize(statement);
+        throw std::runtime_error("SQL error: " + error);
     }
     sqlFinalize(statement);
     return books;
@@ -74,12 +76,12 @@ bool BooksTable::updateBook(database* db, const Book& book) {
         std::cerr << "SQL error: " << errorMessage(db) << std::endl;
         return false;
     }
-    setText(statement, 1, book.mTitle);
-    setText(statement, 2, book.mAuthor);
-    setText(statement, 3, book.mGenre);
-    setText(statement, 4, book.mIsbn);
-    setInt(statement, 5, book.mId);
-    if (!evaluateStatement(statement)) {
+    if (!setText(statement, 1, book.mTitle) ||
+        !setText(statement, 2, book.mAuthor) ||
+        !setText(statement, 3, book.mGenre) ||
+        !setText(statement, 4, book.mIsbn) ||
+        !setInt(statement, 5, book.mId) ||
+        !evaluateStatement(statement)) {
         std::cerr << "SQL error: " << errorMessage(db) << std::endl;
         sqlFinalize(statement);
         return false;
@@ -98,8 +100,7 @@ bool BooksTable::deleteBook(database* db, int bookId) {
         std::cerr << "SQL error: " << errorMessage(db) << std::endl;
         return false;
     }
-    setInt(statement, 1, bookId);
-    if (!evaluateStatement(statement)) {
+    if (!setInt(statement, 1, bookId) || !evaluateStatement(statement)) {
         std::cerr << "SQL error: " << errorMessage(db) << std::endl;
         sqlFinalize(statement);
         return false;

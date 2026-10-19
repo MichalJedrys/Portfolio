@@ -20,12 +20,12 @@ inline bool prepareStatement(database* db, std::string str, sqlStatement** stmt)
     return (sqlite3_prepare_v2(db, str.c_str(), -1, stmt, 0) == SQLITE_OK);
 }
 
-inline void setText(sqlStatement* stmt, uint8_t position, std::string str){
-    sqlite3_bind_text(stmt, position, str.c_str(), -1, SQLITE_TRANSIENT);
+inline bool setText(sqlStatement* stmt, uint8_t position, std::string str){
+    return sqlite3_bind_text(stmt, position, str.c_str(), -1, SQLITE_TRANSIENT) == SQLITE_OK;
 }
 
-inline void setInt(sqlStatement* stmt, uint8_t position, int value) {
-    sqlite3_bind_int(stmt, position, value);
+inline bool setInt(sqlStatement* stmt, uint8_t position, int value) {
+    return sqlite3_bind_int(stmt, position, value) == SQLITE_OK;
 }
 
 inline bool evaluateStatement(sqlStatement* stmt){
@@ -45,7 +45,8 @@ inline uint16_t sqlFinalize(sqlStatement* stmt){
 }
 
 inline std::string getText(sqlStatement* stmt, uint8_t column) {
-    return std::string(reinterpret_cast<const char*>(sqlite3_column_text(stmt, column)));
+    const auto* text = sqlite3_column_text(stmt, column);
+    return text ? reinterpret_cast<const char*>(text) : "";
 }
 
 inline int getInt(sqlStatement* stmt, uint8_t column) {

@@ -2,6 +2,7 @@
 #include "Table.hpp"
 #include <iostream>
 #include <sstream>
+#include <stdexcept>
 
 namespace {
 bool readPositiveInteger(std::istream& input, std::ostream& output, int& value) {
@@ -59,10 +60,12 @@ void displayMenu(database* db, std::istream& input, std::ostream& output) {
                 break;
             }
             case 2:
-                books = BooksTable::viewBooks(db);
-                for(auto &book : books)
-                {
-                    output << book << std::endl;
+                try {
+                    books = BooksTable::viewBooks(db);
+                    for (const auto& book : books)
+                        output << book << std::endl;
+                } catch (const std::runtime_error& error) {
+                    output << "Failed to list books: " << error.what() << '\n';
                 }
                 break;
             case 3: {
