@@ -1,32 +1,73 @@
 # Library Management System
 
-A console book catalogue to practice C++17 and SQLite.
+A C++17 console catalogue backed by SQLite, with prepared statements for book operations and automated regression tests for data integrity and error handling.
 
-## Implemented scope
+## Features
 
-- Add books with a title, author, genre, and ISBN.
-- List, update, and delete stored books through a console menu.
-- Store records in SQLite, using prepared statements for book mutations.
-- GoogleTest cases exercise add, view, update, and delete operations against a test database.
+- Add, list, update, and delete books with a title, author, genre, and ISBN.
+- Preserve records and book IDs across application launches.
+- Reject duplicate ISBNs without replacing existing books, and report missing IDs on update or delete.
+- Validate console input, require title/author/ISBN, allow an empty genre, and exit cleanly on EOF.
 
-Login, member management, borrowing, returns, fines, search, and reporting may be added in the future. These application features are not implemented. User-related source files exist but are not included in the current library build target.
+## Build and test
 
-## Code to review
+Requires CMake, a C++17 compiler, and a compatible build tool. SQLite and GoogleTest source are bundled under `3rd_party/`.
 
-- [Console menu](source/src/Menu.cpp)
-- [Book table operations](source/src/Table.cpp) and [SQLite wrapper](source/include/SQLiteWrapper.hpp)
+From the repository root, with MinGW-w64 and CMake on PATH on Windows:
+
+```powershell
+cmake -S "Library Management System" -B build/library -G "MinGW Makefiles" -DCMAKE_BUILD_TYPE=Release
+cmake --build build/library --parallel 4
+ctest --test-dir build/library --output-on-failure --parallel 4
+```
+
+A clean build and all 20 tests have been verified with GCC/MinGW-w64 on Windows. The executable is produced at `Library Management System/output/LibraryManagementSystem.exe`. Current CMake configuration writes the executable into the source tree and imports GoogleTest libraries from fixed `.a` paths; MSVC builds have not been verified.
+
+## Run
+
+Open or create a database at an explicit path:
+
+```powershell
+& ".\Library Management System\output\LibraryManagementSystem.exe" ".\build\library\demo-catalogue.db"
+& ".\Library Management System\output\LibraryManagementSystem.exe" --help
+```
+
+Quote paths containing spaces. Relative paths are resolved from the current working directory, and the parent directory must already exist. Reuse the same database path on subsequent launches to retain the catalogue.
+
+With no arguments, open or create `LibraryDatabase.db` in the current working directory. Use a separate demo database to preserve the committed sample.
+
+Exit codes: `0` for a normal exit, EOF, or help; `1` for startup errors; `2` for invalid arguments. Database-operation errors are reported while the menu remains available.
+
+## Persistence walkthrough
+
+Use a new database filename for a clean demonstration. Launch the executable with the same path each time.
+
+| Launch | Menu actions | Expected result |
+| --- | --- | --- |
+| 1 | Add two books with different ISBNs, then select **5** to exit. | Both records are saved. |
+| 2 | Select **2** to list books, note their IDs, update one with **3**, then exit. | Previously saved records are available for editing. |
+| 3 | List books, verify the updated title and unchanged ID, delete the other book with **4**, then exit. | The update survived restarting. |
+| 4 | List books, then attempt a duplicate ISBN and an update/delete using a missing ID. Exit. | The deleted book stays absent; rejected operations report an error. |
+| 5 | List books again. | The remaining book and its ID are unchanged. |
+
+This sequence has also been checked automatically across separate processes using an isolated database, including a path containing spaces. The committed sample database was preserved.
+
+## Test coverage
+
+The suite contains 18 GoogleTest cases and two CLI checks. Database tests use private in-memory databases and cover CRUD operations, IDs above 255, bound-string lifetimes, duplicate ISBNs, missing IDs, nullable genres, binding/query failures, and table clearing. Menu tests cover malformed input, required fields, and EOF during incomplete operations.
+
+## Implementation
+
+- [Console menu and input handling](source/src/Menu.cpp)
+- [Book operations](source/src/Table.cpp) and [SQLite wrapper](source/include/SQLiteWrapper.hpp)
 - [Book model](source/include/Book.hpp)
-- [Database tests](test/src/BookUnitTests.cpp)
-- [Entry point](output/src/main.cpp)
+- [Database and menu tests](test/src/BookUnitTests.cpp)
+- [Entry point and database-path handling](output/src/main.cpp)
 
-## Build and run notes
+## Scope and limitations
 
-Requires CMake 3.10 or later and a C++17 compiler. SQLite source and GoogleTest are bundled under `3rd_party/`. See the [repository guide](../docs/REPOSITORY_GUIDE.md) for build commands and the existing GoogleTest build caveat. A fresh build has not been verified as part of this README update.
+The application implements a book catalogue. Member accounts, authentication, borrowing, returns, and fines are not implemented; the existing user-related source files are excluded from the build.
 
-The executable target is `LibraryManagementSystem`. It opens or creates `LibraryDatabase.db` in its working directory. Run it from a scratch directory to preserve the committed sample database. Tests use a database named `TestDatabase` in their working directory.
-
-## Next improvements
-
-Verify reproducible builds and tests, strengthen input validation and database error handling, and extend tests before adding member or loan workflows.
+ISBN uniqueness is enforced, but ISBN format and checksum validation are not implemented. See the [repository guide](../docs/REPOSITORY_GUIDE.md) for the wider directory layout and build constraints.
 
 [Back to portfolio](../README.md)
