@@ -36,32 +36,20 @@ void VendingMachine::work()
         product = SelectBev(Option);
         try
         {
+            if (Option <= 5)
+                MilkAndSugar(Option);
+            else
+                SoySauce();
+        }
+        catch (const InvalidOperator& ex)
+        {
+            std::cout << "\nError: " << ex.what() << std::endl;
+            return;
+        }
+        try
+        {
             if (PaymentProcessing(product))
-            {
-                if (Option <= 5) {
-                    try
-                    {
-                        MilkAndSugar(Option);
-                    }
-                    catch (const InvalidOperator& ex)
-                    {
-                        std::cout << "\nError: " << ex.what() << std::endl;
-                        return;
-                    }
-                }
-                else {
-                    try
-                    {
-                        SoySauce();
-                    }
-                    catch (const InvalidOperator& ex)
-                    {
-                        std::cout << "\nError: " << ex.what() << std::endl;
-                        return;
-                    }
-                }
                 PrepDisp(product);
-            }
         }
         catch (const InvalidPayment& ex)
         {

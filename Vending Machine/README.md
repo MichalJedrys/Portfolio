@@ -23,10 +23,10 @@ This is a learning simulation. Its maintenance password is hardcoded, transactio
 
 ## Build and run notes
 
-Requires CMake 3.10 or later and a C++17 compiler. The executable target is `VendingMachine`, with output configured under `output/`. See the [repository guide](../docs/REPOSITORY_GUIDE.md) for build commands. A fresh build and interactive execution have not been verified as part of this README update. No project-owned automated tests are present.
+Requires CMake 3.13 or later and a C++17 compiler. The executable target is `VendingMachine`, with output configured under `output/`. See the [repository guide](../docs/REPOSITORY_GUIDE.md) for build commands. The build and six GoogleTest order-flow checks have been verified with GCC/MinGW-w64 on Windows. Extras are validated before accepting payment; the checks cover invalid extras, completed coffee/soup orders, and cancelled payment. GoogleTest is bundled under `3rd_party/google_test`, matching the other projects.
 
 ## Next improvements
 
-Add payment and input-validation tests, represent money in integer units, and separate simulation state from console I/O before extending the interface.
+Extend payment and input-validation tests, represent money in integer units, and separate simulation state from console I/O before extending the interface.
 
 [Back to portfolio](../README.md)

@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.10)
+cmake_minimum_required(VERSION 3.13)
 
 # Set the project name
 project(VendingMachine)
@@ -11,5 +11,9 @@ set(CMAKE_CXX_STANDARD_REQUIRED True)
 add_subdirectory(source)
 add_subdirectory(output)
 
-# Enable testing
-enable_testing()
+# Enable order regression tests.
+include(CTest)
+if(BUILD_TESTING)
+    add_subdirectory(3rd_party)
+    add_subdirectory(test)
+endif()
