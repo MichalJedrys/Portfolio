@@ -1,4 +1,5 @@
 #include "Controller.hpp"
+#include <limits>
 
 bool Controller::PaymentProcessing(item p) 
 {
@@ -7,17 +8,31 @@ bool Controller::PaymentProcessing(item p)
     std::cout << "  The machine gives the change.  \n\n"; 
     double Rest = p.first;
     double Payment = 0;
+    const auto cancel = [&]() {
+        std::cout << "\nPayment cancelled.\n";
+        if (Rest < p.first)
+            std::cout << "Refunding " << p.first - Rest << "$\n";
+        return false;
+    };
 
     while (Rest > 0) {
-        std::cout << "(Simulate not inserting coins in time by entering 0)\n";
+        std::cout << "(Enter 0 to cancel payment and return inserted coins)\n";
         std::cout << " Insert coin : ";
-        std::cin >> Payment;
+        if (!(std::cin >> Payment)) {
+            if (std::cin.eof() || std::cin.bad())
+                return cancel();
+            std::cin.clear();
+            std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+            std::cout << "\nError: " << InvalidPayment().what() << '\n';
+            continue;
+        }
         if (Payment != 0 && Payment != 0.25 && Payment != 0.5 && Payment != 1 && Payment != 2 && Payment != 5) 
         {
-            throw InvalidPayment();
+            std::cout << "\nError: " << InvalidPayment().what() << '\n';
+            continue;
         }
         if (Payment == 0) {
-            return false;
+            return cancel();
         }
         Rest = Rest - Payment;
     }

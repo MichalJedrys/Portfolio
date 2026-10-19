@@ -7,11 +7,11 @@ A C++17 console simulation with display, controller, and feeder components.
 ## Implemented scope
 
 - Ten products: hot drinks and soups, with milk, sugar, or soy sauce options depending on the selection.
-- Simulated coin payments, cancellation by entering zero, and change calculation.
+- Simulated coin payments, cancellation with refunds by entering zero, and change calculation. Invalid coins are rejected without losing accepted credit.
 - Maintenance options for session transactions, resetting collected money, and shutdown.
 - Exceptions for several invalid menu choices and payment values.
 
-This is a learning simulation. Its maintenance password is hardcoded, transactions are held in memory, and money uses floating-point values. Entering zero simulates a payment timeout; an actual timed payment workflow is not implemented.
+The maintenance password is hardcoded, transactions are held in memory, and money uses floating-point values. Entering zero cancels payment; an actual timed payment workflow is not implemented.
 
 ## Code to review
 
@@ -23,7 +23,7 @@ This is a learning simulation. Its maintenance password is hardcoded, transactio
 
 ## Build and run notes
 
-Requires CMake 3.13 or later and a C++17 compiler. The executable target is `VendingMachine`, with output configured under `output/`. See the [repository guide](../docs/REPOSITORY_GUIDE.md) for build commands. The build and six GoogleTest order-flow checks have been verified with GCC/MinGW-w64 on Windows. Extras are validated before accepting payment; the checks cover invalid extras, completed coffee/soup orders, and cancelled payment. GoogleTest is bundled under `3rd_party/google_test`, matching the other projects.
+Requires CMake 3.13 or later and a C++17 compiler. The executable target is `VendingMachine`, with output configured under `output/`. See the [repository guide](../docs/REPOSITORY_GUIDE.md) for build commands. The build and 14 GoogleTest checks have been verified with GCC/MinGW-w64 on Windows. Extras are validated before accepting payment; the checks cover invalid extras, completed orders, cancellation and refunds, invalid coins, text input, EOF during payment, and change. GoogleTest is bundled under `3rd_party/google_test`, matching the other projects.
 
 ## Next improvements
 

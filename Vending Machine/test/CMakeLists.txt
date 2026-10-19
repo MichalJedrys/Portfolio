@@ -3,6 +3,7 @@ include(CTest)
 
 add_executable(vending_order_tests
     src/OrderTests.cpp
+    src/PaymentTests.cpp
 )
 
 target_link_libraries(vending_order_tests PUBLIC
