@@ -5,6 +5,6 @@
 #include "SQLiteWrapper.hpp"
 #include <iostream>
 
-void displayMenu(database* db);
+void displayMenu(database* db, std::istream& input = std::cin, std::ostream& output = std::cout);
 
 #endif // MENU_HPP

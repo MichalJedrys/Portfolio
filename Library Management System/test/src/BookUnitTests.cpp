@@ -2,9 +2,11 @@
 #include "Book.hpp"
 #include "Table.hpp"
 #include "SQLiteWrapper.hpp"
+#include "Menu.hpp"
 #include <algorithm>
 #include <array>
 #include <memory>
+#include <sstream>
 
 class BookTest : public ::testing::Test {
 protected:
@@ -187,4 +189,57 @@ TEST(BookMutationTest, MissingBookIdsDoNotReportSuccess) {
     EXPECT_FALSE(BooksTable::deleteBook(db.get(), original.mId));
     EXPECT_FALSE(BooksTable::updateBook(db.get(), original));
     EXPECT_TRUE(BooksTable::viewBooks(db.get()).empty());
+}
+
+class BookMenuTest : public BookTest {
+protected:
+    std::string runMenu(const std::string& text) {
+        std::istringstream input(text);
+        std::ostringstream output;
+        displayMenu(db, input, output);
+        return output.str();
+    }
+};
+
+TEST_F(BookMenuTest, InvalidMenuNumbersRecoverWithoutPerformingActions) {
+    const auto output = runMenu("abc\n1.5\n0\n-1\n999999999999999999999999\n5junk\n6\n"
+                                "1\nTitle\nAuthor\n\n9781234567890\n5\n");
+    books = BooksTable::viewBooks(db);
+    ASSERT_EQ(books.size(), 1u);
+    EXPECT_EQ(books[0], Book(0, "Title", "Author", "", "9781234567890"));
+    EXPECT_NE(output.find("Please enter a positive whole number"), std::string::npos);
+    EXPECT_NE(output.find("Invalid choice"), std::string::npos);
+    EXPECT_NE(output.find("Exiting..."), std::string::npos);
+}
+
+TEST_F(BookMenuTest, InvalidBookIdsRecoverBeforeUpdateAndDelete) {
+    ASSERT_TRUE(BooksTable::addBook(db, Book(0, "Original", "Author", "Genre", "9781234567890")));
+    const auto output = runMenu("3\nabc\n0\n-1\n1.5\n999999999999999999999999\n1\n"
+                                "Updated\nAuthor\nGenre\n9781234567890\n"
+                                "4\nabc\n0\n-1\n1abc\n1\n5\n");
+    EXPECT_TRUE(BooksTable::viewBooks(db).empty());
+    EXPECT_NE(output.find("Book updated successfully."), std::string::npos);
+    EXPECT_NE(output.find("Book deleted successfully."), std::string::npos);
+}
+
+TEST_F(BookMenuTest, RequiredFieldsRejectWhitespaceButGenreCanBeEmpty) {
+    const auto output = runMenu("1\n \t\nTitle\n\nAuthor\n\n\t\n9781234567890\n5\n");
+    books = BooksTable::viewBooks(db);
+    ASSERT_EQ(books.size(), 1u);
+    EXPECT_EQ(books[0], Book(0, "Title", "Author", "", "9781234567890"));
+    EXPECT_NE(output.find("This field cannot be blank."), std::string::npos);
+}
+
+TEST_F(BookMenuTest, EofLeavesIncompleteOperationsWithoutDatabaseChanges) {
+    const Book original(0, "Original", "Author", "Genre", "9781234567890");
+    ASSERT_TRUE(BooksTable::addBook(db, original));
+    for (const char* text : {"", "1\n", "1\nPartial", "1\nTitle\nAuthor\nGenre\n",
+                             "3\n", "3\n1\nUpdated\n", "4\n"}) {
+        SCOPED_TRACE(text);
+        runMenu(text);
+        books = BooksTable::viewBooks(db);
+        ASSERT_EQ(books.size(), 1u);
+        EXPECT_EQ(books[0].mId, 1);
+        EXPECT_EQ(books[0], original);
+    }
 }

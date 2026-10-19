@@ -19,4 +19,4 @@ target_link_libraries(book_test PUBLIC
     gmock_main
 )
 
-gtest_discover_tests(book_test XML_OUTPUT_DIR ${CMAKE_BINARY_DIR}/test_results/book_test)
+gtest_discover_tests(book_test XML_OUTPUT_DIR ${CMAKE_BINARY_DIR}/test_results/book_test PROPERTIES TIMEOUT 10)
