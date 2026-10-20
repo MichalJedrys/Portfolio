@@ -1,18 +1,17 @@
 # Vending Machine — C++
 
-A C++17 console simulation with display, controller, and feeder components.
+A C++17 console application that simulates product selection, payments, and order preparation, with separate display, controller, and feeder components.
 
 [Python variant](../archive/Vending%20Machine%20%28Python%29/README.md)
 
-## Implemented scope
+## Features
 
-- Ten products: hot drinks and soups, with milk, sugar, or soy sauce options depending on the selection.
-- Simulated coin payments, cancellation with refunds by entering zero, and change calculation. Invalid coins are rejected without losing accepted credit.
-- Maintenance options for session transactions, resetting collected money, and shutdown.
-- Line-based input validation across menus, extras, and payments; EOF exits the application and refunds any incomplete payment.
-- Exceptions for several invalid menu choices and payment values.
+- Ten drinks and soups with optional extras.
+- Coin payments, change, cancellation, and refunds.
+- Maintenance options for transaction history, cash collection, and shutdown.
+- Input validation and graceful handling of end-of-input.
 
-The maintenance password is hardcoded, transactions are held in memory, and money uses floating-point values. Entering zero cancels payment; an actual timed payment workflow is not implemented.
+The simulation uses in-memory transactions, a fixed maintenance password, and floating-point monetary values.
 
 ## Code to review
 
@@ -24,10 +23,10 @@ The maintenance password is hardcoded, transactions are held in memory, and mone
 
 ## Build and run notes
 
-Requires CMake 3.13 or later and a C++17 compiler. The executable target is `VendingMachine`, with output configured under `output/`. See the [repository guide](../docs/REPOSITORY_GUIDE.md) for build commands. The build and 40 CTest checks (39 GoogleTest cases and one executable EOF check) have been verified with GCC/MinGW-w64 on Windows. The checks cover orders, refunds, change, input recovery, malformed values, and EOF across all prompts. GoogleTest is bundled under `3rd_party/google_test`, matching the other projects.
+Build with CMake and a C++17 compiler, then run `VendingMachine`. Automated tests use GoogleTest; build and test instructions are available in the [repository guide](../docs/REPOSITORY_GUIDE.md).
 
 ## Next improvements
 
-Extend payment and input-validation tests, represent money in integer units, and separate simulation state from console I/O before extending the interface.
+Represent money in integer units and separate simulation state from console I/O.
 
 [Back to portfolio](../README.md)
