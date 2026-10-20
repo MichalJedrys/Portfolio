@@ -11,9 +11,11 @@ class Display {
 public:
     void Start();
 
+    void Shutdown();
+
     int MainMenu();
 
-    int MaintenanceMenu();
+    int MaintenanceMenu(bool requestPassword = true);
 
     void PrepDisp(item p);
 

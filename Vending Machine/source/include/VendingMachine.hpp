@@ -7,7 +7,7 @@
 
 class VendingMachine : public Controller, public Display, public Feeder {
 public:
-    void work();
+    bool work();
 
 private:
     int Option;

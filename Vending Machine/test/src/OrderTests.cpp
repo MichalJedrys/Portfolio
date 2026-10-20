@@ -107,7 +107,46 @@ TEST_F(VendingOrderTest, RefundedCreditDoesNotCarryIntoNextOrder) {
 }
 
 TEST_F(VendingOrderTest, CompleteNewOrderAfterMaintenancePause) {
-    const std::string text = RunOrder("11\nHardPassword\n1\ncontinue now\n5\n1\nx\nx\n", 2);
+    const std::string text = RunOrder("11\nHardPassword\n1\ncontinue now\n4\n5\n1\nx\nx\n", 2);
     EXPECT_EQ(text.find("Error:"), std::string::npos);
     ExpectCompletedOrder(text, "1 - Hot Water", "Collected: 1$");
+}
+
+TEST_F(VendingOrderTest, ExitFromMainMenuWithoutPassword) {
+    input.str("0\n5\n");
+    VendingMachine machine;
+    EXPECT_FALSE(machine.work());
+    EXPECT_NE(output.str().find("shutting down"), std::string::npos);
+    EXPECT_EQ(output.str().find("Enter a password"), std::string::npos);
+    EXPECT_EQ(machine.MainMenu(), 5); // Exit must leave subsequent input untouched.
+}
+
+TEST_F(VendingOrderTest, ShutdownFromMaintenanceReturnsNormally) {
+    input.str("11\nHardPassword\n3\n5\n");
+    VendingMachine machine;
+    EXPECT_FALSE(machine.work());
+    EXPECT_NE(output.str().find("shutting down"), std::string::npos);
+    EXPECT_EQ(machine.MainMenu(), 5);
+}
+
+TEST_F(VendingOrderTest, MaintenanceActionsStayAuthenticatedUntilReturn) {
+    input.str("11\nHardPassword\n1\n\n2\n\n4\n5\n");
+    VendingMachine machine;
+    EXPECT_TRUE(machine.work());
+    const std::string text = output.str();
+    EXPECT_NE(text.find("Collected: 0$"), std::string::npos);
+    const auto password = text.find("Enter a password");
+    ASSERT_NE(password, std::string::npos);
+    EXPECT_EQ(text.find("Enter a password", password + 1), std::string::npos);
+    EXPECT_EQ(text.find("Error:"), std::string::npos);
+    EXPECT_EQ(machine.MainMenu(), 5);
+}
+
+TEST_F(VendingOrderTest, LeavingMaintenanceRequiresAuthenticationOnReentry) {
+    input.str("11\nHardPassword\n4\n11\nwrong\n5\n");
+    VendingMachine machine;
+    EXPECT_TRUE(machine.work());
+    EXPECT_TRUE(machine.work());
+    EXPECT_NE(output.str().find("Wrong password"), std::string::npos);
+    EXPECT_EQ(machine.MainMenu(), 5);
 }

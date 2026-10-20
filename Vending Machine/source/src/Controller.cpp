@@ -71,15 +71,6 @@ void Controller::SelectMOption(int mOption)
         std::getline(std::cin, c);
         MoneySum = 0;
         break;
-    case 3:
-        std::cout << "Vending Machine is shutting down .";
-        std::this_thread::sleep_for(std::chrono::milliseconds(500));
-        std::cout << ".";
-        std::this_thread::sleep_for(std::chrono::milliseconds(500));
-        std::cout << ".\n";
-        std::this_thread::sleep_for(std::chrono::milliseconds(500));
-        exit(0);
-        break;
     case 4:
         break;
     }

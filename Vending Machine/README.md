@@ -8,7 +8,8 @@ A C++17 console application that simulates product selection, payments, and orde
 
 - Ten drinks and soups with optional extras.
 - Coin payments, change, cancellation, and refunds.
-- Maintenance options for transaction history, cash collection, and shutdown.
+- Maintenance menu for transaction history and cash collection, with return and shutdown options.
+- Direct exit from the main menu.
 - Input validation and graceful handling of end-of-input.
 
 The simulation uses in-memory transactions, a fixed maintenance password, and floating-point monetary values.

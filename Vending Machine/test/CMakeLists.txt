@@ -12,6 +12,11 @@ add_test(NAME VendingCli.EndOfInput
         -P ${CMAKE_CURRENT_SOURCE_DIR}/EndOfInput.cmake)
 set_tests_properties(VendingCli.EndOfInput PROPERTIES TIMEOUT 30)
 
+add_test(NAME VendingCli.ExitNavigation
+    COMMAND ${CMAKE_COMMAND} -DPROGRAM=$<TARGET_FILE:VendingMachine>
+        -P ${CMAKE_CURRENT_SOURCE_DIR}/ExitNavigation.cmake)
+set_tests_properties(VendingCli.ExitNavigation PROPERTIES TIMEOUT 10)
+
 target_link_libraries(vending_order_tests PUBLIC
     vending_machine_lib
     gtest_main

@@ -10,6 +10,15 @@ void Display::Start() {
     std::this_thread::sleep_for(std::chrono::milliseconds(500));
 }
 
+void Display::Shutdown() {
+    std::cout << "Vending Machine is shutting down .";
+    std::this_thread::sleep_for(std::chrono::milliseconds(500));
+    std::cout << ".";
+    std::this_thread::sleep_for(std::chrono::milliseconds(500));
+    std::cout << ".\n";
+    std::this_thread::sleep_for(std::chrono::milliseconds(500));
+}
+
 int Display::MainMenu() 
 {
     std::cout << " \n";
@@ -25,41 +34,43 @@ int Display::MainMenu()
     std::cout << " 9. Miso Soup       3.50$ \n";
     std::cout << "10. Onion Soup      3.00$ \n";
     std::cout << "11. Maintenance mode      \n";
+    std::cout << " 0. Exit                  \n";
     std::cout << " \n";
     std::cout << "Pick an option: ";
-    if (!ReadConsoleInput(Option) || Option <= 0 || Option > 11)
+    if (!ReadConsoleInput(Option) || Option < 0 || Option > 11)
     {
         throw IncorrectOption();
     }
     return Option;
 }
 
-int Display::MaintenanceMenu() {
-    std::string pass;
-    std::cout << "Enter a password: ";
-    if (!ReadConsoleInput(pass)) {
-        if (std::cin)
-            throw IncorrectMTOption();
-        return 0;
+int Display::MaintenanceMenu(bool requestPassword) {
+    if (requestPassword) {
+        std::string pass;
+        std::cout << "Enter a password: ";
+        if (!ReadConsoleInput(pass)) {
+            if (std::cin)
+                throw IncorrectMTOption();
+            return 0;
+        }
+        if (pass != Controller::password) {
+            std::cout << "\nWrong password. Exiting to main menu...\n";
+            return 0;
+        }
     }
-    if (pass == Controller::password) 
-    {
+    while (std::cin) {
         std::cout << "\n     Maintenance MENU     \n";
         std::cout << "1. History of transactions\n";
         std::cout << "2. Money withdraw         \n";
         std::cout << "3. Turn off the machine   \n";
         std::cout << "4. Return to main menu    \n\n";
         std::cout << "Pick an option: ";
-        if (!ReadConsoleInput(Option) || Option <= 0 || Option > 4) {
-            throw IncorrectMTOption();
-        }
-        return Option;
+        if (ReadConsoleInput(Option) && Option >= 1 && Option <= 4)
+            return Option;
+        if (std::cin)
+            std::cout << "\nError: " << IncorrectMTOption().what() << '\n';
     }
-    else 
-    {
-        std::cout << "\nWrong password. Exiting to main menu...\n";
-        return 0;
-    }
+    return 0;
 }
 
 void Display::PrepDisp(item p) {
