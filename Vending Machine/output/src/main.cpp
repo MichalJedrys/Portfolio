@@ -4,7 +4,7 @@ int main()
 {
 	VendingMachine Machine;
 	Machine.Start();
-	while (1)
+	while (std::cin)
 	{
 		Machine.work();
 	}

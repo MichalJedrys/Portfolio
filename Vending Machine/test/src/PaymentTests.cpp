@@ -83,6 +83,12 @@ TEST_F(VendingPaymentTest, RefundAcceptedCoinsOnEndOfInput) {
     EXPECT_NE(output.str().find("Refunding 1.5$"), std::string::npos);
 }
 
+TEST_F(VendingPaymentTest, RejectTrailingTextWithoutAcceptingCoin) {
+    RunPayment("1\n1junk\n1\n0.5\n", true);
+    ExpectInvalidCoin();
+    EXPECT_EQ(output.str().find("Your change is"), std::string::npos);
+}
+
 TEST_F(VendingPaymentTest, ReturnChangeAfterOverpayment) {
     RunPayment("5\n", true);
     EXPECT_NE(output.str().find("Your change is 2.5$"), std::string::npos);

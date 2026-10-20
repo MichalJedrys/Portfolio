@@ -10,7 +10,8 @@ void VendingMachine::work()
     }
     catch (const IncorrectOption& ex)
     {
-        std::cout << "\nError: " << ex.what() << std::endl;
+        if (std::cin)
+            std::cout << "\nError: " << ex.what() << std::endl;
         return;
     }
     
@@ -21,7 +22,8 @@ void VendingMachine::work()
         }
         catch (const IncorrectMTOption& ex)
         {
-            std::cout << "\nError: " << ex.what() << std::endl;
+            if (std::cin)
+                std::cout << "\nError: " << ex.what() << std::endl;
             return;
         }
         if (mOption == 0) {
@@ -43,7 +45,8 @@ void VendingMachine::work()
         }
         catch (const InvalidOperator& ex)
         {
-            std::cout << "\nError: " << ex.what() << std::endl;
+            if (std::cin)
+                std::cout << "\nError: " << ex.what() << std::endl;
             return;
         }
         try

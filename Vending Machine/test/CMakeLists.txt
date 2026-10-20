@@ -4,7 +4,13 @@ include(CTest)
 add_executable(vending_order_tests
     src/OrderTests.cpp
     src/PaymentTests.cpp
+    src/InputTests.cpp
 )
+
+add_test(NAME VendingCli.EndOfInput
+    COMMAND ${CMAKE_COMMAND} -DPROGRAM=$<TARGET_FILE:VendingMachine>
+        -P ${CMAKE_CURRENT_SOURCE_DIR}/EndOfInput.cmake)
+set_tests_properties(VendingCli.EndOfInput PROPERTIES TIMEOUT 30)
 
 target_link_libraries(vending_order_tests PUBLIC
     vending_machine_lib

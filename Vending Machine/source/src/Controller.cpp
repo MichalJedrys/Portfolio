@@ -1,5 +1,5 @@
 #include "Controller.hpp"
-#include <limits>
+#include "ConsoleInput.hpp"
 
 bool Controller::PaymentProcessing(item p) 
 {
@@ -18,11 +18,9 @@ bool Controller::PaymentProcessing(item p)
     while (Rest > 0) {
         std::cout << "(Enter 0 to cancel payment and return inserted coins)\n";
         std::cout << " Insert coin : ";
-        if (!(std::cin >> Payment)) {
-            if (std::cin.eof() || std::cin.bad())
+        if (!ReadConsoleInput(Payment)) {
+            if (!std::cin)
                 return cancel();
-            std::cin.clear();
-            std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
             std::cout << "\nError: " << InvalidPayment().what() << '\n';
             continue;
         }
@@ -54,7 +52,7 @@ bool Controller::PaymentProcessing(item p)
 
 void Controller::SelectMOption(int mOption) 
 {
-    char c;
+    std::string c;
     switch (mOption) 
     {
     case 1:
@@ -63,14 +61,14 @@ void Controller::SelectMOption(int mOption)
             std::cout << k.first << " - " << k.second << std::endl;
         }
         std::cout << "\nReturning to maintenance menu...\n";
-        std::cout << "Press any key to continue.\n";
-        std::cin >> c;
+        std::cout << "Press Enter to continue.\n";
+        std::getline(std::cin, c);
         break;
     case 2:
         std::cout << "\nCollected: " << MoneySum << "$\n";
         std::cout << "Returning to maintenance menu...\n";
-        std::cout << "Press any key to continue.\n";
-        std::cin >> c;
+        std::cout << "Press Enter to continue.\n";
+        std::getline(std::cin, c);
         MoneySum = 0;
         break;
     case 3:

@@ -1,4 +1,5 @@
 #include "Display.hpp"
+#include "ConsoleInput.hpp"
 
 void Display::Start() {
     std::cout << "Vending Machine is starting .";
@@ -26,8 +27,7 @@ int Display::MainMenu()
     std::cout << "11. Maintenance mode      \n";
     std::cout << " \n";
     std::cout << "Pick an option: ";
-    std::cin >> Option;
-    if (Option <= 0 || Option > 11) 
+    if (!ReadConsoleInput(Option) || Option <= 0 || Option > 11)
     {
         throw IncorrectOption();
     }
@@ -37,7 +37,11 @@ int Display::MainMenu()
 int Display::MaintenanceMenu() {
     std::string pass;
     std::cout << "Enter a password: ";
-    std::cin >> pass;
+    if (!ReadConsoleInput(pass)) {
+        if (std::cin)
+            throw IncorrectMTOption();
+        return 0;
+    }
     if (pass == Controller::password) 
     {
         std::cout << "\n     Maintenance MENU     \n";
@@ -46,8 +50,7 @@ int Display::MaintenanceMenu() {
         std::cout << "3. Turn off the machine   \n";
         std::cout << "4. Return to main menu    \n\n";
         std::cout << "Pick an option: ";
-        std::cin >> Option;
-        if (Option <= 0 || Option > 4) {
+        if (!ReadConsoleInput(Option) || Option <= 0 || Option > 4) {
             throw IncorrectMTOption();
         }
         return Option;
