@@ -59,11 +59,11 @@ int Display::MaintenanceMenu(bool requestPassword) {
         }
     }
     while (std::cin) {
-        std::cout << "\n     Maintenance MENU     \n";
-        std::cout << "1. History of transactions\n";
-        std::cout << "2. Money withdraw         \n";
-        std::cout << "3. Turn off the machine   \n";
-        std::cout << "4. Return to main menu    \n\n";
+        std::cout << "\nMaintenance menu\n";
+        std::cout << "1. Transaction history\n";
+        std::cout << "2. Withdraw collected money\n";
+        std::cout << "3. Shut down\n";
+        std::cout << "4. Return to main menu\n\n";
         std::cout << "Pick an option: ";
         if (ReadConsoleInput(Option) && Option >= 1 && Option <= 4)
             return Option;

@@ -26,6 +26,10 @@ The simulation uses in-memory transactions, a fixed maintenance password, and fl
 
 Build with CMake and a C++17 compiler, then run `VendingMachine`. Automated tests use GoogleTest; build and test instructions are available in the [repository guide](../docs/REPOSITORY_GUIDE.md).
 
+## Quick demonstration
+
+Select coffee (`1`), choose extras, and insert `5` to receive change. Open maintenance (`11`, demo password `HardPassword`) to review transactions or collect cash. Return to the main menu with `4` and exit with `0`.
+
 ## Next improvements
 
 Represent money in integer units and separate simulation state from console I/O.

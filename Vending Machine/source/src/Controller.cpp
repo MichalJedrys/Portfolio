@@ -3,9 +3,9 @@
 
 bool Controller::PaymentProcessing(item p) 
 {
-    std::cout << "\n  Vending machine accepts only:  \n"; 
-    std::cout << "  0.25$, 0.5$, 1$, 2$, 5$ coins. \n"; 
-    std::cout << "  The machine gives the change.  \n\n"; 
+    std::cout << "\nSelected: " << p.second << " (" << p.first << "$)\n";
+    std::cout << "Accepted coins: 0.25$, 0.5$, 1$, 2$, 5$. Change is returned.\n";
+    std::cout << "Enter 0 to cancel payment and return inserted coins.\n";
     double Rest = p.first;
     double Payment = 0;
     const auto cancel = [&]() {
@@ -16,8 +16,8 @@ bool Controller::PaymentProcessing(item p)
     };
 
     while (Rest > 0) {
-        std::cout << "(Enter 0 to cancel payment and return inserted coins)\n";
-        std::cout << " Insert coin : ";
+        std::cout << "\nRemaining: " << Rest << "$\n";
+        std::cout << "Insert coin: ";
         if (!ReadConsoleInput(Payment)) {
             if (!std::cin)
                 return cancel();
@@ -56,6 +56,9 @@ void Controller::SelectMOption(int mOption)
     switch (mOption) 
     {
     case 1:
+        std::cout << "\nTransaction history:\n";
+        if (PaymentsVec.empty())
+            std::cout << "No transactions yet.\n";
         for (auto k : PaymentsVec)
         {
             std::cout << k.first << " - " << k.second << std::endl;
