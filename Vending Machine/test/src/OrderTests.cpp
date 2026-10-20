@@ -19,10 +19,11 @@ protected:
         std::cout.rdbuf(previousOutput);
     }
 
-    std::string RunOrder(const std::string& script) {
+    std::string RunOrder(const std::string& script, int operations = 1) {
         input.str(script);
         VendingMachine machine;
-        machine.work();
+        for (int i = 0; i < operations; ++i)
+            machine.work();
         machine.SelectMOption(1); // Inspect transaction history.
         machine.SelectMOption(2); // Inspect collected money.
         return output.str();
@@ -43,15 +44,18 @@ protected:
     }
 
     void ExpectCompletedOrder(const std::string& text, const std::string& receipt,
-                              const std::string& total, const std::string& extrasPrompt) {
+                              const std::string& total, const std::string& extrasPrompt = "") {
         const auto receiptPosition = text.find(receipt);
         ASSERT_NE(receiptPosition, std::string::npos);
         EXPECT_EQ(text.find(receipt, receiptPosition + 1), std::string::npos);
         EXPECT_NE(text.find(total), std::string::npos);
-        EXPECT_NE(text.find(" is ready."), std::string::npos);
+        const auto readyPosition = text.find(" is ready.");
+        ASSERT_NE(readyPosition, std::string::npos);
+        EXPECT_EQ(text.find(" is ready.", readyPosition + 1), std::string::npos);
         const auto paymentPosition = text.find("Insert coin");
         ASSERT_NE(paymentPosition, std::string::npos);
-        EXPECT_LT(text.find(extrasPrompt), paymentPosition);
+        if (!extrasPrompt.empty())
+            EXPECT_LT(text.find(extrasPrompt), paymentPosition);
     }
 };
 
@@ -79,4 +83,31 @@ TEST_F(VendingOrderTest, CompleteSoupOrderOnce) {
 
 TEST_F(VendingOrderTest, CancelPaymentWithoutRecordingSale) {
     ExpectAbortedOrder(RunOrder("1\nn\n0\n0\nx\nx\n"));
+}
+
+TEST_F(VendingOrderTest, CompleteNewOrderAfterInvalidMenuInput) {
+    const std::string text = RunOrder("1x\n5\n1\nx\nx\n", 2);
+    EXPECT_NE(text.find("Input value is incorrect!"), std::string::npos);
+    ExpectCompletedOrder(text, "1 - Hot Water", "Collected: 1$");
+}
+
+TEST_F(VendingOrderTest, CompleteNewOrderAfterInvalidSugarInput) {
+    const std::string text = RunOrder("1\nn\n1.5\n5\n1\nx\nx\n", 2);
+    EXPECT_NE(text.find("Invalid Operator!"), std::string::npos);
+    EXPECT_EQ(text.find(" - Coffee"), std::string::npos);
+    ExpectCompletedOrder(text, "1 - Hot Water", "Collected: 1$");
+}
+
+TEST_F(VendingOrderTest, RefundedCreditDoesNotCarryIntoNextOrder) {
+    const std::string text = RunOrder("1\nn\n0\n1\n0.5\n0\n5\n1\nx\nx\n", 2);
+    EXPECT_NE(text.find("Refunding 1.5$"), std::string::npos);
+    EXPECT_EQ(text.find(" - Coffee"), std::string::npos);
+    EXPECT_EQ(text.find("Your change is"), std::string::npos);
+    ExpectCompletedOrder(text, "1 - Hot Water", "Collected: 1$");
+}
+
+TEST_F(VendingOrderTest, CompleteNewOrderAfterMaintenancePause) {
+    const std::string text = RunOrder("11\nHardPassword\n1\ncontinue now\n5\n1\nx\nx\n", 2);
+    EXPECT_EQ(text.find("Error:"), std::string::npos);
+    ExpectCompletedOrder(text, "1 - Hot Water", "Collected: 1$");
 }
