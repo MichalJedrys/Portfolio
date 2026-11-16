@@ -1,0 +1,3 @@
+#pragma once
+
+#define PLAYRUNTIME_VERSION "@PROJECT_VERSION@"

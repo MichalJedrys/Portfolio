@@ -135,4 +135,4 @@ Given the same supported semantic version, program, configuration, events and ad
 
 ## Definition of v0.1 completion
 
-The sample runs through both CLI and simulator; scripts have meaningful diagnostics; the three traces and boundary cases are automated; sessions replay exactly; supported Windows/Linux builds pass; benchmark methodology and results are published; clean-checkout build and demo steps work. None of these checks has run yet because this commit contains documentation only.
+The sample runs through both CLI and simulator; scripts have meaningful diagnostics; the three traces and boundary cases are automated; sessions replay exactly; supported Windows/Linux builds pass; benchmark methodology and results are published; clean-checkout build and demo steps work. These runtime completion checks remain unverified. The current build scaffold has only build and CLI smoke tests; it does not implement the engine.

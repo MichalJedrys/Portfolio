@@ -75,7 +75,7 @@ PlayRuntime/
   docs/adr/
 ```
 
-Only the documentation exists now. The next change introduces an independent CMake project with C++20 and a source-built, pinned GoogleTest dependency. Build output belongs outside the source tree. The optional SDL3 simulator must not become a dependency of core tests or the headless CLI. Supported toolchain versions will be recorded after verification.
+The documentation, an independent C++20 CMake scaffold, a build-identity core API, a smoke CLI and source-built pinned GoogleTest tests now exist. The remaining layout above is proposed. Build output belongs outside the source tree. SDL3 is not currently a dependency and must remain separate from core tests and the CLI. See the README for build commands and the verified toolchain.
 
 ## Validation strategy
 
@@ -86,4 +86,4 @@ Only the documentation exists now. The next change introduces an independent CMa
 - Test malformed scripts and sessions, then add bounded fuzzing and sanitizer checks.
 - Measure representative workloads and optimize only an observed bottleneck.
 
-No runtime tests or benchmarks can run in this documentation-only stage.
+Build and CLI smoke tests now run. Runtime semantic tests and benchmarks remain future work because the engine is not implemented.
