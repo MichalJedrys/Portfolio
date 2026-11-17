@@ -10,7 +10,7 @@ FetchContent_Declare(googletest
 )
 FetchContent_MakeAvailable(googletest)
 
-add_executable(playruntime_tests build_smoke_test.cpp)
+add_executable(playruntime_tests build_smoke_test.cpp runtime_test.cpp)
 playruntime_configure_target(playruntime_tests)
 target_link_libraries(playruntime_tests PRIVATE playruntime::core GTest::gtest_main)
 target_compile_definitions(playruntime_tests PRIVATE EXPECTED_PROJECT_VERSION="${PROJECT_VERSION}")

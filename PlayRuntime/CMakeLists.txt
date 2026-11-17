@@ -10,7 +10,7 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 include(cmake/ProjectOptions.cmake)
 configure_file(cmake/version_config.hpp.in generated/version_config.hpp @ONLY)
 
-add_library(playruntime_core STATIC src/core/version.cpp)
+add_library(playruntime_core STATIC src/core/version.cpp src/core/runtime.cpp)
 add_library(playruntime::core ALIAS playruntime_core)
 playruntime_configure_target(playruntime_core)
 target_compile_features(playruntime_core PUBLIC cxx_std_20)

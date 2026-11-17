@@ -16,3 +16,9 @@ execute_process(COMMAND "${CLI}" --unknown RESULT_VARIABLE result
 if(NOT result EQUAL 2 OR NOT output STREQUAL "" OR NOT error MATCHES "Unsupported arguments")
     message(FATAL_ERROR "Unexpected invalid-argument response: exit=${result}, stdout=${output}, stderr=${error}")
 endif()
+
+execute_process(COMMAND "${CLI}" --demo RESULT_VARIABLE result
+    OUTPUT_VARIABLE output ERROR_VARIABLE error TIMEOUT 10)
+if(NOT result EQUAL 0 OR NOT output STREQUAL "0us event=0 light=cyan\n1000000us event=2 light=cyan\n" OR NOT error STREQUAL "")
+    message(FATAL_ERROR "Unexpected demo response: exit=${result}, stdout=${output}, stderr=${error}")
+endif()

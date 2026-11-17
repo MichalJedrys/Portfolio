@@ -1,6 +1,6 @@
 # Requirements and execution contract
 
-Status: initial v0.1 design, awaiting implementation. This document defines intended behaviour, not verified capabilities. Numeric limits are initial configurable defaults, not measured hardware budgets.
+Status: v0.1 target contract, partially implemented. Typed external events, batch validation and logical advancement exist. Timers, full state/action semantics, trace serialization and configurable limits below remain planned. See the README for the implemented subset and validation. Numeric limits are design defaults, not measured hardware budgets.
 
 ## Scope
 
@@ -135,4 +135,4 @@ Given the same supported semantic version, program, configuration, events and ad
 
 ## Definition of v0.1 completion
 
-The sample runs through both CLI and simulator; scripts have meaningful diagnostics; the three traces and boundary cases are automated; sessions replay exactly; supported Windows/Linux builds pass; benchmark methodology and results are published; clean-checkout build and demo steps work. These runtime completion checks remain unverified. The current build scaffold has only build and CLI smoke tests; it does not implement the engine.
+The sample runs through both CLI and simulator; scripts have meaningful diagnostics; the three traces and boundary cases are automated; sessions replay exactly; supported Windows/Linux builds pass; benchmark methodology and results are published; clean-checkout build and demo steps work. These runtime completion checks remain unverified. The current subset has typed-event runtime tests and a CLI demo; the full quest, timers, states and resource budgets remain unimplemented.

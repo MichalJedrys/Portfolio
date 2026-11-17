@@ -1,6 +1,6 @@
 # Architecture
 
-Status: proposed v0.1 structure. The [execution contract](requirements.md) is the source of truth for observable behaviour. The [single-owner core ADR](adr/0001-deterministic-core.md) explains the principal design decision.
+Status: target v0.1 structure; only the subset described in the README is implemented. The [execution contract](requirements.md) is the source of truth for observable behaviour. The [single-owner core ADR](adr/0001-deterministic-core.md) explains the principal design decision.
 
 ## Components and ownership
 
@@ -27,6 +27,10 @@ The host owns the program, runtime and adapters. Program storage is immutable an
 | Host/session layer | CLI, time normalization, recording, version checks, canonical trace serialization | Alternative rule-execution semantics |
 | Simulator | Virtual sensors, display, playback controls and adapter delivery | A second implementation of the engine |
 | Device adapters | Input normalization or output delivery with explicit errors | Changes to already-recorded core history |
+
+## Current subset
+
+The current Runtime owns copied LightRule entries rather than referring to an immutable compiled Program. It returns a host-owned vector of commands from advance_to; it has no callbacks or retained command history. This is intentionally an incremental API. The bounded output/draining design below, compiled programs and reset are future work. See the README for allocation and capacity limitations.
 
 ## Runtime boundary
 
@@ -75,7 +79,7 @@ PlayRuntime/
   docs/adr/
 ```
 
-The documentation, an independent C++20 CMake scaffold, a build-identity core API, a smoke CLI and source-built pinned GoogleTest tests now exist. The remaining layout above is proposed. Build output belongs outside the source tree. SDL3 is not currently a dependency and must remain separate from core tests and the CLI. See the README for build commands and the verified toolchain.
+The documentation, independent C++20 CMake build, typed-event core, programmatic light rules, CLI demo and GoogleTest suites now exist. The remaining layout above is proposed. Build output belongs outside the source tree. SDL3 is not currently a dependency and must remain separate from core tests and the CLI. See the README for build commands and the verified toolchain.
 
 ## Validation strategy
 
@@ -86,4 +90,4 @@ The documentation, an independent C++20 CMake scaffold, a build-identity core AP
 - Test malformed scripts and sessions, then add bounded fuzzing and sanitizer checks.
 - Measure representative workloads and optimize only an observed bottleneck.
 
-Build and CLI smoke tests now run. Runtime semantic tests and benchmarks remain future work because the engine is not implemented.
+Typed-event ordering, batch validation and horizon tests now run alongside build and CLI checks. Timer, state, scripted-program, replay-file and benchmark validation remain future work.

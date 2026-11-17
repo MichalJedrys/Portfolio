@@ -1,10 +1,10 @@
 # PlayRuntime
 
-PlayRuntime is a planned C++20 interaction engine that turns sensor events into scripted light and sound commands. A desktop simulator will let users create, record and replay interactions without physical hardware.
+PlayRuntime is a C++20 interaction engine in development that turns sensor events into scripted light and sound commands. A desktop simulator will let users create, record and replay interactions without physical hardware.
 
 ## Status
 
-The project currently contains the design documents and a C++20 build scaffold: a static core library, a CLI exposing build information, and smoke tests. Interaction execution, scripting and replay are not implemented, and no runtime performance is measured. Development takes place on `develop-play-runtime`.
+The project currently implements typed button, colour and motion events, atomic batch submission, deterministic ordering and explicit logical time advancement. Programmatic rules map event kinds to light commands, with a runnable CLI demonstration and automated tests. Timers, state machines, scripting, session replay and the simulator are not implemented yet; runtime performance has not been measured. Development takes place on `develop-play-runtime`.
 
 ## Example interaction
 
@@ -28,7 +28,30 @@ Physical sensors, wireless protocols and firmware deployment are later extension
 - [Architecture](docs/architecture.md): components, ownership and data flow.
 - [ADR 0001](docs/adr/0001-deterministic-core.md): the decision to use a single-owner deterministic core.
 
-## Build and smoke tests
+## Current runtime API and demo
+
+`--demo` runs two button events with an unmatched motion event between them, using a programmatically configured button-to-cyan rule. It produces:
+
+```text
+0us event=0 light=cyan
+1000000us event=2 light=cyan
+```
+
+See [the public API](include/playruntime/runtime.hpp), [implementation](src/core/runtime.cpp) and [tests](tests/runtime_test.cpp). A `Runtime` copies a list of `LightRule` entries. The first rule whose event kind matches emits one `SetLight`; colour rules currently match all valid sensor colours. This deliberately small API is not yet the planned script or state-machine representation.
+
+`submit_batch` validates timestamps, strictly increasing session sequence IDs and typed payloads before inserting anything. Rejected batches leave the existing queue and sequence watermark unchanged. Events can arrive with out-of-order timestamps; execution sorts by timestamp, then sequence ID. Sequence IDs need not be contiguous and may begin at zero.
+
+`advance_to` processes through an inclusive logical horizon and returns host-owned structured commands containing event time and source sequence. Advancing to the same horizon again is a no-op. Negative or decreasing horizons fail without consuming pending events. Once a horizon is closed, input at or before that time is rejected. There are no clocks, sleeps, I/O or callbacks in the core.
+
+Errors are returned as `InputError` with a typed code and, for submission errors, the offending batch index. Invalid rule configuration throws `std::invalid_argument`. Allocation failure follows normal C++ exception behaviour; the queue replacement and output allocation occur before committing runtime mutations.
+
+The current queue and returned output use dynamic vectors. Configurable capacity limits and per-advance work budgets belong to commit 7; no bounded-memory claim is made yet. `CommandRecord` is a minimal output record, not the future canonical trace with state/error records and ordinals. Reset, sound, timer tie ordering and serialized replay are also later steps. Repeating a run in tests verifies deterministic output, not session-file replay support.
+
+### Validation for typed event dispatch (commit 4)
+
+The Windows LLVM-MinGW toolchain listed below passes Debug and Release builds with strict warnings, clang-format 18 checks, 14 runtime tests, the linked-build test, and CLI integration checks. Tests cover chronological and same-time ordering across batches, atomic invalid-input rejection, empty input, first-rule precedence, closed horizons, integer limits and repeated/split advancement. Linux/MSVC and sanitizer validation for this change remain pending its first CI run after push.
+
+## Build and tests
 
 Prerequisites: CMake 3.24 or newer, Ninja, and a C++20 compiler available in your terminal. The test dependency also configures a C compiler. On Windows with MSVC, use a Visual Studio developer terminal so the compiler and SDK are available. With LLVM-MinGW, keep its bin directory on PATH while building and running, including for its runtime DLLs.
 
@@ -44,14 +67,15 @@ For Release, replace `debug` with `release`. To select a compiler on a fresh bui
 
 The presets write to `../build/play-runtime/debug` and `../build/play-runtime/release`, which are ignored by Git. No generated file belongs in a tracked `output/` directory. The build is independent of the other portfolio projects and does not use their prebuilt GoogleTest archives.
 
-Run the smoke CLI from `PlayRuntime/` on Windows:
+Run the CLI from `PlayRuntime/` on Windows:
 
 ```powershell
 ..\build\play-runtime\debug\playruntime.exe --version
 ..\build\play-runtime\debug\playruntime.exe --help
+..\build\play-runtime\debug\playruntime.exe --demo
 ```
 
-On Linux, use `../build/play-runtime/debug/playruntime`. No arguments displays help; unsupported arguments return exit code 2. The version identifies the scaffold, not a completed v0.1 release.
+On Linux, use `../build/play-runtime/debug/playruntime`. No arguments displays help; unsupported arguments return exit code 2. The version identifies the development build, not a completed v0.1 release.
 
 ### Dependencies and offline builds
 
@@ -66,7 +90,7 @@ cmake -S . -B ../build/play-runtime/no-tests -G Ninja -DBUILD_TESTING=OFF -DCMAK
 cmake --build ../build/play-runtime/no-tests
 ```
 
-### Validation recorded for this scaffold
+### Build-foundation validation (commit 2)
 
 Windows x64 using LLVM-MinGW 20261104 (Clang 23.1.5), CMake 4.5.0, Ninja 1.13.2 and GoogleTest 1.17.0:
 

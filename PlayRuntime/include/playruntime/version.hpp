@@ -4,7 +4,7 @@
 
 namespace playruntime {
 
-// Build identity only; the runtime engine is not implemented yet.
+// Build identity; this is not a runtime capability or session-format version.
 [[nodiscard]] std::string_view version() noexcept;
 
 } // namespace playruntime
