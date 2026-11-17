@@ -75,4 +75,55 @@ Windows x64 using LLVM-MinGW 20261104 (Clang 23.1.5), CMake 4.5.0, Ninja 1.13.2 
 - A temporary failing GoogleTest case produced a failing CTest exit code; the probe was removed and the passing suite rebuilt.
 - A separate `BUILD_TESTING=OFF` build produced the CLI without fetching GoogleTest.
 
-These checks validate build integration and CLI plumbing only, not engine behaviour. Linux, MSVC and the minimum CMake version have not been exercised locally. The next milestone adds the cross-platform CI matrix.
+These checks validate build integration and CLI plumbing only, not engine behaviour. Linux, MSVC and the minimum CMake version have not been exercised locally. The CI configuration below adds the cross-platform matrix; its remote execution is still pending.
+
+## Continuous integration and local quality checks
+
+The [PlayRuntime workflow](../.github/workflows/play-runtime.yml) runs for relevant changes under `PlayRuntime/` or to the workflow itself. Pushes are limited to `main` and `develop-play-runtime`; pull requests targeting any branch are included. Manual dispatch is also declared (GitHub requires the workflow on the default branch before that UI is available).
+
+| Job | Environment | Checks |
+| --- | --- | --- |
+| Linux / GCC 13 | Ubuntu 24.04 | Debug build, project warnings as errors, CTest |
+| Linux / Clang 18 | Ubuntu 24.04 | Debug build, project warnings as errors, CTest |
+| Windows / MSVC | Windows 2022, Visual Studio 2022 x64 | Debug build, project warnings as errors, CTest |
+| Linux / ASan and UBSan | Ubuntu 24.04, Clang 18 | Instrumented project targets, fail-fast sanitizer diagnostics, CTest |
+| C++ formatting | Ubuntu 24.04, clang-format 18 | Check project C++ sources without modifying them |
+
+The workflow uses read-only repository permissions, disables persistent checkout credentials, and pins the checkout action to a full commit SHA. GoogleTest remains pinned by archive hash. Runner images and OS packages receive upstream updates; this is not a fully frozen toolchain environment. Path-filtered checks may remain pending when skipped if configured as required branch checks; consider that before changing branch protection.
+
+Project warnings use `/W4 /permissive-` on MSVC or `-Wall -Wextra -Wpedantic` on GCC/Clang. `PLAYRUNTIME_WARNINGS_AS_ERRORS` defaults to OFF for local builds and is enabled in CI. These flags are private to project targets and do not modify GoogleTest compilation.
+
+From `PlayRuntime/`, enable strict warnings with:
+
+```sh
+cmake --preset debug -DPLAYRUNTIME_WARNINGS_AS_ERRORS=ON
+cmake --build --preset debug
+ctest --preset debug
+```
+
+To check formatting, install clang-format 18 and run from `PlayRuntime/`:
+
+```sh
+cmake -P cmake/CheckFormatting.cmake
+```
+
+If the formatter is not on PATH, use `cmake -DCLANG_FORMAT=/path/to/clang-format -P cmake/CheckFormatting.cmake`. The script rejects other major versions, scans only project `include`, `src`, `apps` and `tests` C++ files, and never downloads dependencies. Apply fixes with clang-format 18's `-i` option to the reported files, then rerun the check.
+
+On Linux with Clang, configure sanitizers in a separate directory:
+
+```sh
+cmake -S . -B ../build/play-runtime/sanitizers -G Ninja -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++ -DCMAKE_BUILD_TYPE=Debug -DPLAYRUNTIME_ENABLE_SANITIZERS=ON -DPLAYRUNTIME_WARNINGS_AS_ERRORS=ON
+cmake --build ../build/play-runtime/sanitizers
+ASAN_OPTIONS=detect_leaks=1:halt_on_error=1 UBSAN_OPTIONS=print_stacktrace=1:halt_on_error=1 ctest --test-dir ../build/play-runtime/sanitizers --output-on-failure --no-tests=error
+```
+
+The sanitizer option deliberately supports only Linux GCC/Clang. It instruments project code, not GoogleTest itself. CLI and test executables link the sanitizer runtimes. A detected ASan/UBSan problem fails execution rather than recovering silently. Passing these checks is useful evidence, not proof of memory safety or complete behavioural coverage.
+
+### Validation status for the CI change
+
+- Workflow syntax and expressions checked with actionlint 1.7.12 (optional shellcheck/pyflakes integrations disabled).
+- clang-format 18.1.8 check passed; a temporary formatting violation failed as expected, then was removed.
+- Windows LLVM-MinGW Debug build and both smoke tests passed with warnings as errors.
+- Generated compile commands confirmed strict warnings apply to the three project targets, not GoogleTest.
+- Enabling sanitizers on Windows failed configuration with the intended unsupported-platform message.
+- **Not yet verified:** GitHub-hosted Linux GCC/Clang, Windows MSVC and actual ASan/UBSan execution. Review the first remote run after committing and pushing before considering the CI milestone complete.

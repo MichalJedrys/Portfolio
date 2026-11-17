@@ -1,0 +1,110 @@
+name: PlayRuntime CI
+
+on:
+  push:
+    branches: [main, develop-play-runtime]
+    paths:
+      - 'PlayRuntime/**'
+      - '.github/workflows/play-runtime.yml'
+  pull_request:
+    paths:
+      - 'PlayRuntime/**'
+      - '.github/workflows/play-runtime.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: play-runtime-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  linux:
+    name: Linux / ${{ matrix.compiler }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - compiler: GCC 13
+            cc: gcc-13
+            cxx: g++-13
+            package: g++-13
+          - compiler: Clang 18
+            cc: clang-18
+            cxx: clang++-18
+            package: clang-18
+    env:
+      CC: ${{ matrix.cc }}
+      CXX: ${{ matrix.cxx }}
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
+      - name: Install build tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends ninja-build ${{ matrix.package }}
+      - name: Configure
+        run: cmake -S PlayRuntime -B build/ci -G Ninja -DCMAKE_BUILD_TYPE=Debug -DPLAYRUNTIME_WARNINGS_AS_ERRORS=ON
+      - name: Build
+        run: cmake --build build/ci --parallel 2
+      - name: Test
+        run: ctest --test-dir build/ci --output-on-failure --no-tests=error
+
+  windows:
+    name: Windows / MSVC
+    runs-on: windows-2022
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
+      - name: Configure
+        run: cmake -S PlayRuntime -B build/ci -G "Visual Studio 17 2022" -A x64 -DPLAYRUNTIME_WARNINGS_AS_ERRORS=ON
+      - name: Build
+        run: cmake --build build/ci --config Debug --parallel 2
+      - name: Test
+        run: ctest --test-dir build/ci -C Debug --output-on-failure --no-tests=error
+
+  sanitizers:
+    name: Linux / ASan and UBSan
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    env:
+      CC: clang-18
+      CXX: clang++-18
+      ASAN_OPTIONS: detect_leaks=1:halt_on_error=1
+      ASAN_SYMBOLIZER_PATH: /usr/bin/llvm-symbolizer-18
+      UBSAN_OPTIONS: print_stacktrace=1:halt_on_error=1
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
+      - name: Install build tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends ninja-build clang-18 llvm-18
+      - name: Configure
+        run: cmake -S PlayRuntime -B build/sanitizers -G Ninja -DCMAKE_BUILD_TYPE=Debug -DPLAYRUNTIME_WARNINGS_AS_ERRORS=ON -DPLAYRUNTIME_ENABLE_SANITIZERS=ON
+      - name: Build
+        run: cmake --build build/sanitizers --parallel 2
+      - name: Test
+        run: ctest --test-dir build/sanitizers --output-on-failure --no-tests=error
+
+  format:
+    name: C++ formatting
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
+      - name: Install formatter
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends clang-format-18
+      - name: Check formatting
+        run: cmake -P PlayRuntime/cmake/CheckFormatting.cmake

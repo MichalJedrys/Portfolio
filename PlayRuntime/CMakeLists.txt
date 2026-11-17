@@ -7,16 +7,19 @@ if(CMAKE_SOURCE_DIR STREQUAL CMAKE_BINARY_DIR)
 endif()
 
 set(CMAKE_CXX_EXTENSIONS OFF)
+include(cmake/ProjectOptions.cmake)
 configure_file(cmake/version_config.hpp.in generated/version_config.hpp @ONLY)
 
 add_library(playruntime_core STATIC src/core/version.cpp)
 add_library(playruntime::core ALIAS playruntime_core)
+playruntime_configure_target(playruntime_core)
 target_compile_features(playruntime_core PUBLIC cxx_std_20)
 target_include_directories(playruntime_core
     PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/include"
     PRIVATE "${CMAKE_CURRENT_BINARY_DIR}/generated")
 
 add_executable(playruntime apps/cli/main.cpp)
+playruntime_configure_target(playruntime)
 target_link_libraries(playruntime PRIVATE playruntime::core)
 
 include(CTest)

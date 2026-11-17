@@ -3,8 +3,6 @@
 
 namespace playruntime {
 
-std::string_view version() noexcept {
-    return PLAYRUNTIME_VERSION;
-}
+std::string_view version() noexcept { return PLAYRUNTIME_VERSION; }
 
 } // namespace playruntime
